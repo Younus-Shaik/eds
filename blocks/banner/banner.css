@@ -1,0 +1,14 @@
+.banner {
+    background-color: rgba(203, 238, 238, 0.678);
+    padding: 1rem;
+}
+
+.banner img {
+    max-width: 100%;
+    width: auto;
+    height: auto;
+}
+
+.banner:last-child {
+    color: rgba(138, 138, 121, 0.719);
+}
