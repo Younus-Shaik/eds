@@ -1,1 +1,6 @@
 /* stylelint-disable no-empty-source */
+.fragment-wrapper {
+    padding: 7rem;
+    width: 30rem;
+    background-color: gray;
+}
