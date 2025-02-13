@@ -61,8 +61,6 @@ export default async function decorate(block) {
     const fragmentSection = fragment.querySelector(':scope .section');
     if (fragmentSection) {
       block.closest('.section').classList.add(...fragmentSection.classList);
-      console.log(block.closest('.section'))
-      console.log(block.closest('.cards').querySelector('a[href="/hero"]'))
       block.closest('.cards')?.querySelector('a[href="/hero"]')?.replaceWith(...fragment.childNodes);
     }
   }

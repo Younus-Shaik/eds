@@ -199,8 +199,9 @@ button:focus {
 
 button:disabled,
 button:disabled:hover {
-  background-color: var(--light-color);
-  cursor: unset;
+  /* background-color: var(--light-color); */
+  opacity: .4;
+  cursor: not-allowed;
 }
 
 a.button.secondary,
