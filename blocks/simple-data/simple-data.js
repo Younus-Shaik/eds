@@ -75,14 +75,11 @@ function loadTableSummary(block, data) {
 async function loadPagination(block) {
     let container = block.closest('.simple-data');
     removeExistingClass(container, 'pagination')
-    
     let pagination = createDiv('pagination');
-    
     let previous = createButton('previous');
     if (currentPage == 1) {
         previous.setAttribute('disabled', 'true');
     }
-    
     let pages = createDiv('pages');
     let pagesHtml = '';
     for (let i = 1; i <= Math.ceil(totalRecords / recordsPerPage); i++) {
