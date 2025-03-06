@@ -16,9 +16,6 @@ export default function decorate(block) {
   const roadLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   roadLayer.setAttribute('id', 'road-layer');
   
-  const checkpointLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  checkpointLayer.setAttribute('id', 'checkpoint-layer');
-  
   const markerLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   markerLayer.setAttribute('id', 'marker-layer');
   
@@ -55,72 +52,27 @@ export default function decorate(block) {
   roadLayer.appendChild(road);
   roadLayer.appendChild(laneMarkings);
   
-  // Define checkpoints
-  const checkpoints = [
-    { position: 0.2, color: 'blue', label: '1' },
-    { position: 0.35, color: 'green', label: '2' },
-    { position: 0.5, color: 'purple', label: '3' },
-    { position: 0.7, color: 'orange', label: '4' },
-    { position: 0.9, color: 'teal', label: '5' }
+  // Define color stops for the marker
+  const colorStops = [
+    { position: 0.0, color: 'red' },
+    { position: 0.2, color: 'blue' },
+    { position: 0.4, color: 'green' },
+    { position: 0.6, color: 'purple' },
+    { position: 0.8, color: 'orange' },
+    { position: 1.0, color: '#FF5500' }
   ];
-  
-  // Create the indicators for active checkpoints (will be positioned later)
-  const activeIndicators = [];
-  
-  // Add all checkpoints
-  checkpoints.forEach(checkpoint => {
-    // Regular checkpoint
-    const checkpointMarker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    checkpointMarker.classList.add('checkpoint');
-    checkpointMarker.setAttribute('data-position', checkpoint.position);
-    checkpointMarker.setAttribute('r', '8');
-    checkpointMarker.setAttribute('fill', checkpoint.color);
-    
-    // Active indicator (initially hidden)
-    const activeIndicator = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    activeIndicator.setAttribute('r', '12');
-    activeIndicator.setAttribute('fill', 'none');
-    activeIndicator.setAttribute('stroke', checkpoint.color);
-    activeIndicator.setAttribute('stroke-width', '2');
-    activeIndicator.setAttribute('opacity', '0');
-    activeIndicator.classList.add('active-indicator');
-    activeIndicators.push(activeIndicator);
-    
-    // Add label
-    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    label.textContent = checkpoint.label;
-    label.classList.add('checkpoint-label');
-    label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('dominant-baseline', 'central');
-    label.setAttribute('fill', 'white');
-    label.setAttribute('font-size', '10px');
-    label.setAttribute('font-weight', 'bold');
-    
-    // Add to checkpoint layer (will position them later)
-    checkpointLayer.appendChild(activeIndicator);
-    checkpointLayer.appendChild(checkpointMarker);
-    checkpointLayer.appendChild(label);
-  });
-  
-  // Add end marker
-  const endMarker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  endMarker.classList.add('end-marker');
-  endMarker.setAttribute('r', '10');
-  endMarker.setAttribute('fill', '#FF5500');
-  checkpointLayer.appendChild(endMarker);
-  
+
   // Create moving marker (the car/indicator)
   const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   marker.classList.add('marker');
   marker.setAttribute('r', '12');
-  marker.setAttribute('fill', 'red');
+  marker.setAttribute('fill', colorStops[0].color); // Start with first color
   marker.setAttribute('stroke', 'white');
   marker.setAttribute('stroke-width', '2');
   markerLayer.appendChild(marker);
   
   // Add all layers to SVG in the correct order
   svg.appendChild(roadLayer);
-  svg.appendChild(checkpointLayer);
   svg.appendChild(markerLayer);
   
   // Add SVG to container
@@ -141,31 +93,9 @@ export default function decorate(block) {
       overflow: hidden;
     }
     
-    .checkpoint {
-      filter: drop-shadow(0 0 3px rgba(0,0,0,0.3));
-    }
-    
-    .checkpoint-label {
-      pointer-events: none;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-    
     .marker {
       filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
       transition: fill 0.3s ease;
-    }
-    
-    .end-marker {
-      opacity: 0.8;
-    }
-    
-    .active-indicator {
-      animation: pulse 1.5s infinite ease-out;
-    }
-    
-    @keyframes pulse {
-      0% { opacity: 0.8; stroke-width: 2; r: 10; }
-      100% { opacity: 0; stroke-width: 1; r: 20; }
     }
   `;
   document.head.appendChild(style);
@@ -199,34 +129,6 @@ export default function decorate(block) {
     const roadPath = document.getElementById('roadPath');
     const pathLength = roadPath.getTotalLength();
     
-    // Calculate positions for all checkpoints
-    document.querySelectorAll('.checkpoint').forEach((checkpoint, index) => {
-      const position = parseFloat(checkpoint.getAttribute('data-position'));
-      const point = roadPath.getPointAtLength(position * pathLength);
-      
-      checkpoint.setAttribute('cx', point.x);
-      checkpoint.setAttribute('cy', point.y);
-      
-      // Position active indicators
-      activeIndicators[index].setAttribute('cx', point.x);
-      activeIndicators[index].setAttribute('cy', point.y);
-      
-      // Position labels
-      const label = document.querySelectorAll('.checkpoint-label')[index];
-      label.setAttribute('x', point.x);
-      label.setAttribute('y', point.y);
-    });
-    
-    // Position end marker
-    const endPoint = roadPath.getPointAtLength(pathLength);
-    endMarker.setAttribute('cx', endPoint.x);
-    endMarker.setAttribute('cy', endPoint.y);
-    
-    // Position marker at start
-    const startPoint = roadPath.getPointAtLength(0);
-    marker.setAttribute('cx', startPoint.x);
-    marker.setAttribute('cy', startPoint.y);
-    
     // Create an array of points for smoother animation
     const points = [];
     const totalPoints = 1000; // Large number for smoother animation
@@ -237,57 +139,33 @@ export default function decorate(block) {
       points.push({ x: point.x, y: point.y });
     }
     
-    // Get the exact end point
-    points[totalPoints] = { 
-      x: endPoint.x, 
-      y: endPoint.y 
-    };
+    // Position marker at start
+    const startPoint = roadPath.getPointAtLength(0);
+    marker.setAttribute('cx', startPoint.x);
+    marker.setAttribute('cy', startPoint.y);
     
     // Create scroll trigger
     ScrollTrigger.create({
       trigger: container,
       start: "top top",
-      end: "+=3000", // Longer scroll distance
-      scrub: 0.5,    // Smoother scrubbing
+      end: "+=3000",
+      scrub: 0.5,
       pin: true,
       onUpdate: self => {
-        // Calculate progress with extra boost at the end to ensure we reach 100%
         const baseProgress = self.progress || 0;
         const adjustedProgress = Math.min(1, baseProgress * 1.01);
-        
-        // Get point index
         const pointIndex = Math.floor(adjustedProgress * totalPoints);
         
-        // Safety check
         if (pointIndex >= 0 && pointIndex <= totalPoints && points[pointIndex]) {
-          // Set marker position
           marker.setAttribute('cx', points[pointIndex].x);
           marker.setAttribute('cy', points[pointIndex].y);
           
-          // Force marker to exact end position when very close to end
-          if (adjustedProgress > 0.99) {
-            marker.setAttribute('cx', endPoint.x);
-            marker.setAttribute('cy', endPoint.y);
-          }
-          
-          // Update checkpoints and marker color
-          checkpoints.forEach((checkpoint, i) => {
-            if (baseProgress >= checkpoint.position) {
-              // Set indicator visible
-              activeIndicators[i].setAttribute('opacity', '1');
-              marker.setAttribute('fill', checkpoint.color);
-            } else {
-              // Hide indicator
-              activeIndicators[i].setAttribute('opacity', '0');
+          // Update marker color based on progress
+          for (let i = colorStops.length - 1; i >= 0; i--) {
+            if (baseProgress >= colorStops[i].position) {
+              marker.setAttribute('fill', colorStops[i].color);
+              break;
             }
-          });
-          
-          // Special handling for end point
-          if (baseProgress > 0.95) {
-            marker.setAttribute('fill', '#FF5500');
-            gsap.to(endMarker, { r: 13, duration: 0.3, ease: "elastic.out(1, 0.3)" });
-          } else {
-            gsap.to(endMarker, { r: 10, duration: 0.3 });
           }
           
           // Grow marker when reaching the end
@@ -316,7 +194,7 @@ export default function decorate(block) {
       setInterval(() => {
         const st = ScrollTrigger.getAll()[0];
         const progress = st ? st.progress : 0;
-        debugPanel.innerHTML = `Progress: ${(progress * 100).toFixed(1)}%<br>Pos: (${marker.getAttribute('cx')}, ${marker.getAttribute('cy')})<br>End: (${endPoint.x}, ${endPoint.y})`;
+        debugPanel.innerHTML = `Progress: ${(progress * 100).toFixed(1)}%<br>Pos: (${marker.getAttribute('cx')}, ${marker.getAttribute('cy')})`;
       }, 100);
     }
   }
