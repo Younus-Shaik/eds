@@ -1,0 +1,124 @@
+.project-gallery-carousel {
+    display: flex;
+    gap: 1rem; /* Slightly reduced gap for mobile */
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 1rem; /* Prevents cut-off at the bottom */
+    width: 100%;
+    white-space: nowrap;
+
+    &::-webkit-scrollbar {
+        height: 3px; /* Small scrollbar */
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 0px;
+    }
+
+    > * {
+        flex: 0 0 auto; /* Ensures cards don't shrink or grow */
+        scroll-snap-align: start;
+    }
+    .project-card {
+        background-color: var(--adobe-black);
+        border-radius: 1.2rem; /* Slightly smaller radius for mobile */
+        display: flex;
+        flex-direction: column;
+        width: 85vw; /* Mobile-first: card takes most of the viewport width */
+        max-width: 18rem; /* Smaller max-width for mobile */
+        .project-card__image {
+            height: 45%; /* Slightly smaller image height for mobile */
+            img {
+                border-top-left-radius: 1.2rem;
+                border-top-right-radius: 1.2rem;
+                height: 100%;
+                width: 100%;
+                object-fit: cover;
+            }
+        }
+        .project-card__content {
+            padding: 1.2rem;
+
+            h3 {
+                font-size: 1.2rem; /* Smaller font size for mobile */
+                font-weight: 700;
+                color: var(--adobe-white);
+            }
+            p,a {
+                color: var(--link-color);
+                font-size: 0.85rem; /* Slightly smaller font size for mobile */
+            }
+            div p:nth-last-child(2) {
+                color: var(--adobe-white);
+                font-size: 0.85rem;
+            }
+        }
+
+    }
+}
+
+/* Tablet view (768px and up) */
+@media screen and (min-width: 768px) {
+    .project-gallery-carousel {
+        gap: 1.2rem;
+        
+        .project-card {
+            width: 45vw; /* Two cards visible on tablet */
+            max-width: 20rem;
+            border-radius: 1.3rem;
+            
+            .project-card__image {
+                height: 48%;
+                img {
+                    border-top-left-radius: 1.3rem;
+                    border-top-right-radius: 1.3rem;
+                }
+            }
+            
+            .project-card__content {
+                padding: 1.3rem;
+                
+                h3 {
+                    font-size: 1.3rem;
+                }
+                p, a {
+                    font-size: 0.87rem;
+                }
+            }
+        }
+    }
+}
+
+/* Desktop view (1024px and up) */
+@media screen and (min-width: 1024px) {
+    .project-gallery-carousel {
+        gap: 1.4rem;
+        
+        .project-card {
+            width: 30vw; /* Three or more cards visible on desktop */
+            max-width: 24rem;
+            border-radius: 1.4rem;
+            
+            .project-card__image {
+                height: 50%;
+                img {
+                    border-top-left-radius: 1.4rem;
+                    border-top-right-radius: 1.4rem;
+                }
+            }
+            
+            .project-card__content {
+                padding: 1.4rem;
+                
+                h3 {
+                    font-size: 1.4rem;
+                }
+                p, a {
+                    font-size: 0.9rem;
+                }
+            }
+        }
+    }
+}

@@ -15,6 +15,9 @@
   --background-color: white;
   --light-color: #f8f8f8;
   --dark-color: #505050;
+  --adobe-black: #131313;
+  --adobe-white: #ffffff;
+  --adobe-blue: #3b63fb;
   --text-color: #131313;
   --link-color: #3b63fb;
   --link-hover-color: #1d3ecf;
@@ -166,7 +169,7 @@ a:hover {
 }
 
 /* buttons */
-a.button:any-link,
+
 button {
   box-sizing: border-box;
   display: inline-block;

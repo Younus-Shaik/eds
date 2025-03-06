@@ -1,0 +1,70 @@
+.department-carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 1rem 0;
+}
+
+.department-carousel__wrapper {
+    display: flex;
+    will-change: transform;
+    gap: .5rem;
+    height: 13rem;
+    margin: 1.4rem 0.5rem;
+}
+
+/* Different starting position for slow scroll */
+.scroll-slow .department-carousel__wrapper {
+    transform: translateX(-50px);
+}
+
+.department-carousel__slide {
+    flex: 0 0 auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.department-carousel__slide picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.department-carousel__slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.department-carousel__slide:hover img {
+    transform: scale(1.05);
+}
+
+@media (max-width: 1024px) {
+    .department-carousel__wrapper {
+        height: 9rem;
+        gap: 1rem;
+    }
+}
+
+/* Responsive adjustments handled by JS */
+@media (max-width: 477px) {
+    .department-carousel__slide {
+        padding: 0 5px;
+    }
+}
+
+@media (min-width: 478px) and (max-width: 920px) {
+    .department-carousel__slide {
+        padding: 0 8px;
+    }
+}
+
+@media (min-width: 921px) {
+    .department-carousel__slide {
+        padding: 0 12px;
+    }
+}
