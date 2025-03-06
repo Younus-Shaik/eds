@@ -1,0 +1,25 @@
+.road-map {
+    position: relative;
+    min-height: 100vh;
+    div {
+        picture {
+            position: absolute;
+        }
+    }
+    .person-icon {
+        position: absolute;
+        left: 2rem;
+        img {
+            height: 7rem;
+        }
+    }
+    .learn-icon {
+        position: absolute;
+        right: 66%;
+        bottom: 38%;
+        img {
+            height: 10rem;
+        }
+    }
+
+}
