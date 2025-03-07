@@ -157,7 +157,7 @@ export default function decorate(block) {
   marker.appendChild(personPath);
   
   // Scale and center the marker
-  marker.setAttribute('transform', 'translate(-15.5, -65) scale(2)');
+  marker.setAttribute('transform', 'translate(-15.5, -75) scale(2)');
   
   markerLayer.appendChild(marker);
   
@@ -213,7 +213,7 @@ export default function decorate(block) {
     
     // Position marker at start
     const startPoint = roadPath.getPointAtLength(0);
-    marker.setAttribute('transform', `translate(${startPoint.x - 15.5}, ${startPoint.y - 65}) scale(2)`);
+    marker.setAttribute('transform', `translate(${startPoint.x - 19.5}, ${startPoint.y - 75}) scale(2)`);
     
     // Create scroll trigger
     ScrollTrigger.create({
@@ -230,8 +230,8 @@ export default function decorate(block) {
         if (pointIndex >= 0 && pointIndex <= totalPoints && points[pointIndex]) {
           const point = points[pointIndex];
           // Update marker position using transform
-          const scale = baseProgress > 0.98 ? 2.4 : 2;
-          marker.setAttribute('transform', `translate(${point.x - 15.5}, ${point.y - 65}) scale(${scale})`);
+          const scale = baseProgress > 0.98 ? 2 : 2;
+          marker.setAttribute('transform', `translate(${point.x - 27.5}, ${point.y - 79}) scale(${scale})`);
           
           // Update marker icon based on progress
           for (let i = colorStops.length - 1; i >= 0; i--) {
