@@ -5,3 +5,23 @@
   background: white;
   overflow: hidden;
 }
+
+.person-icon {
+    transform: translate(.14%, .1%) scale(.9);
+}
+
+.learn-icon {
+    transform: translate(0.5%, 0.8%) scale(1.2);
+}
+
+.enablement-icon {
+    transform: translate(.4%, .5%) scale(.9);
+}
+
+.deployment-icon {
+    transform: translate(.5%, .7%) scale(.59);
+}
+
+.scroller-hat-icon {
+    transform: translate(.3%, .6%) scale(.34);
+}

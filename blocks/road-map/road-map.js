@@ -17,17 +17,18 @@ export default function decorate(block) {
    personPath.setAttribute('d', 'M15.5 7.5C13.43 7.5 11.75 9.43 11.75 11.5C11.75 13.57 13.43 15.5 15.5 15.5C17.57 15.5 19.25 13.57 19.25 11.5C19.25 9.43 17.57 7.5 15.5 7.5ZM10.375 20.625C10.375 20.625 8.75 20.625 8.75 22.25C8.75 23.875 10.375 27.5 15.5 27.5C20.625 27.5 22.25 23.875 22.25 22.25C22.25 20.625 20.625 20.625 20.625 20.625H10.375Z');
    personPath.setAttribute('fill', '#333333');
    personPath.setAttribute('class', 'current-icon');
+   personPath.classList.add('person-icon');
    
    // Create the book icon
    const learnPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
    learnPath.setAttribute('d', 'M14.5 2H9l-.35.15-.65.64-.65-.64L7 2H1.5l-.5.5v10l.5.5h5.29l.86.85h.7l.86-.85h5.29l.5-.5v-10l-.5-.5zm-7 10.32l-.18-.17L7 12H2V3h4.79l.74.74-.03 8.58zM14 12H9l-.35.15-.14.13V3.7l.7-.7H14v9zM6 5H3v1h3V5zm0 4H3v1h3V9zM3 7h3v1H3V7zm10-2h-3v1h3V5zm-3 2h3v1h-3V7zm0 2h3v1h-3V9z');
    learnPath.setAttribute('fill', '#333333');
    learnPath.setAttribute('transform', 'translate(10, 7) scale(0.8)');
-   learnPath.setAttribute('class', 'current-icon');
+   learnPath.setAttribute('class', 'learn-icon');
 
   // Create the enablement icon
   const enablementPath = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  enablementPath.setAttribute('class', 'current-icon');
+  enablementPath.setAttribute('class', 'enablement-icon');
   
   const enablementMain = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   enablementMain.setAttribute('d', 'M12 4a1 1 0 0 0-1 1c0 1.692-2.046 2.54-3.243 1.343a1 1 0 1 0-1.414 1.414C7.54 8.954 6.693 11 5 11a1 1 0 1 0 0 2c1.692 0 2.54 2.046 1.343 3.243a1 1 0 0 0 1.414 1.414C8.954 16.46 11 17.307 11 19a1 1 0 1 0 2 0c0-1.692 2.046-2.54 3.243-1.343a1 1 0 1 0 1.414-1.414C16.46 15.046 17.307 13 19 13a1 1 0 1 0 0-2c-1.692 0-2.54-2.046-1.343-3.243a1 1 0 0 0-1.414-1.414C15.046 7.54 13 6.693 13 5a1 1 0 0 0-1-1zm-2.992.777a3 3 0 0 1 5.984 0 3 3 0 0 1 4.23 4.231 3 3 0 0 1 .001 5.984 3 3 0 0 1-4.231 4.23 3 3 0 0 1-5.984 0 3 3 0 0 1-4.231-4.23 3 3 0 0 1 0-5.984 3 3 0 0 1 4.231-4.231z');
@@ -43,7 +44,7 @@ export default function decorate(block) {
 
   // Create the deployment icon
   const deploymentPath = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  deploymentPath.setAttribute('class', 'current-icon');
+  deploymentPath.setAttribute('class', 'deployment-icon');
 
   // Create the outer rectangle
   const deploymentRect = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -82,14 +83,42 @@ export default function decorate(block) {
   deploymentPath.appendChild(arrows);
   deploymentPath.setAttribute('transform', 'translate(3, 3) scale(0.6)');
 
+  // Create the scroller hat icon
+  const scrollerHatPath = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  scrollerHatPath.setAttribute('class', 'scroller-hat-icon');
+
+  // Create the main hat shape
+  const hatMain = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  hatMain.setAttribute('d', 'M65.635,24.988l-30-10.037c-0.412-0.139-0.857-0.139-1.27,0l-30,10.037C3.539,25.265,2.987,26.044,3,26.915s0.589,1.634,1.423,1.885l8.16,2.458v6.627c0,0.498,0.403,0.979,0.739,1.348c0.185,0.203,1.385,1.24,2.549,1.715c0.248,0.102,0.503,0.149,0.755,0.149c0.789,0,1.428-0.471,1.744-1.246c0.417-1.022-0.183-2.189-1.205-2.606c-0.093-0.038,0.418-0.126-0.582-0.234v-4.535l3,0.92v16.129C18.645,50.032,18,51.013,18,52.153c0,1.656,1.343,3,3,3s3-1.344,3-3c0-0.55-0.159-1.059-0.417-1.501V34.622l3.858,1.183l7,2.037c0.183,0.054,0.371,0.08,0.559,0.08c0.194,0,0.389-0.028,0.577-0.085l16.006-4.822v4.465c-1,1.22-6.533,4.442-17.287,4.442c-2.417,0-4.24-0.116-6.02-0.356c-1.096-0.138-2.102,0.621-2.249,1.716c-0.147,1.095,0.621,2.102,1.715,2.249c1.958,0.264,4.173,0.392,6.77,0.392c15.159,0,20.533-5.938,20.763-6.19c0.336-0.368,0.307-0.849,0.307-1.348v-6.349c0-0.075-0.014-0.146-0.022-0.219L65.577,28.8c0.834-0.251,1.409-1.014,1.423-1.885C67.013,26.044,66.461,25.265,65.635,24.988z');
+  hatMain.setAttribute('fill', '#333333');
+
+  // Create the middle section
+  const hatMiddle = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  hatMiddle.setAttribute('d', 'M34.99,33.836l-6.404-1.863l-2.53-0.776l9.887-3.468c1.041-0.37,1.774-1.515,1.403-2.555c-0.371-1.041-1.571-1.584-2.61-1.213L21.129,28.77c-0.352,0.125-0.689,0.345-0.962,0.621l-4.699-1.441l-3.865-1.164L35,18.957l23.397,7.828L34.99,33.836z');
+  hatMiddle.setAttribute('fill', '#333333');
+
+  // Create the small circles
+  const hatCircle1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  hatCircle1.setAttribute('d', 'M40.61,30.482c0.096,0,0.193-0.014,0.289-0.043L45.677,29c0.529-0.159,0.829-0.717,0.669-1.245c-0.159-0.528-0.717-0.834-1.245-0.669l-4.778,1.439c-0.528,0.159-0.828,0.717-0.669,1.245C39.784,30.203,40.181,30.482,40.61,30.482z');
+  hatCircle1.setAttribute('fill', '#333333');
+
+  const hatCircle2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  hatCircle2.setAttribute('d', 'M48.887,28.074c0.095,0,0.192-0.014,0.288-0.043l2.227-0.671c0.529-0.159,0.829-0.717,0.669-1.245c-0.159-0.528-0.716-0.832-1.245-0.669l-2.227,0.671c-0.529,0.159-0.829,0.717-0.669,1.245C48.06,27.795,48.457,28.074,48.887,28.074z');
+  hatCircle2.setAttribute('fill', '#333333');
+
+  scrollerHatPath.appendChild(hatMain);
+  scrollerHatPath.appendChild(hatMiddle);
+  scrollerHatPath.appendChild(hatCircle1);
+  scrollerHatPath.appendChild(hatCircle2);
+  scrollerHatPath.setAttribute('transform', 'translate(5, 5) scale(0.4)');
+
   // Define color stops for the marker
   const colorStops = [
-    { position: 0.0, path: personPath },
-    { position: 0.2, path: learnPath },
-    { position: 0.4, path: enablementPath },
-    { position: 0.6, path: deploymentPath },
-    { position: 0.8, path: personPath },
-    { position: 1.0, path: learnPath }
+    { position: 0.0, path: personPath, color: '#FF5500' },
+    { position: 0.25, path: learnPath, color: '#4CAF50' },
+    { position: 0.5, path: enablementPath, color: '#2196F3' },
+    { position: 0.75, path: deploymentPath, color: '#9C27B0' },
+    { position: 1.0, path: scrollerHatPath, color: '#FF9800' }
   ];
 
   // Define layers for proper stacking - this is key to prevent visual issues
@@ -233,7 +262,7 @@ export default function decorate(block) {
           const scale = baseProgress > 0.98 ? 2 : 2;
           marker.setAttribute('transform', `translate(${point.x - 27.5}, ${point.y - 79}) scale(${scale})`);
           
-          // Update marker icon based on progress
+          // Update marker icon and color based on progress
           for (let i = colorStops.length - 1; i >= 0; i--) {
             if (baseProgress >= colorStops[i].position) {
               // Remove existing path
@@ -246,6 +275,9 @@ export default function decorate(block) {
               const newPath = colorStops[i].path.cloneNode(true);
               newPath.classList.add('current-icon');
               marker.appendChild(newPath);
+
+              // Update pin color
+              pinPath.setAttribute('fill', colorStops[i].color);
               break;
             }
           }
