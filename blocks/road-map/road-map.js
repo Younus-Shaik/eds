@@ -130,6 +130,12 @@ export default function decorate(block) {
   
   const markerLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   markerLayer.setAttribute('id', 'marker-layer');
+  markerLayer.style.zIndex = '-1'; // Ensure moving person stays behind markers
+  
+  // Create checkpoint markers (fixed pin and ellipse at each point)
+  const checkpointMarkersLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  checkpointMarkersLayer.setAttribute('id', 'checkpoint-markers-layer');
+  checkpointMarkersLayer.style.zIndex = '1'; // Ensure markers stay in front
   
   // Create road shadow
   const roadShadow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -202,10 +208,6 @@ export default function decorate(block) {
     stopsLayer.appendChild(stopPoint);
   }
   
-  // Create checkpoint markers (fixed pin and ellipse at each point)
-  const checkpointMarkersLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  checkpointMarkersLayer.setAttribute('id', 'checkpoint-markers-layer');
-  
   // Create checkpoint markers at each color stop
   const checkpointMarkers = [];
   for (let i = 0; i < colorStops.length; i++) {
@@ -218,6 +220,7 @@ export default function decorate(block) {
     const checkpointMarker = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     checkpointMarker.classList.add('checkpoint-marker');
     checkpointMarker.setAttribute('data-position', colorStops[i].position);
+    checkpointMarker.style.zIndex = '2'; // Ensure each marker stays in front
     
     // Create the pin shape
     const pinPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -266,6 +269,7 @@ export default function decorate(block) {
   const movingPerson = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   movingPerson.classList.add('moving-person');
   movingPerson.setAttribute('fill', '#434343');
+  movingPerson.style.zIndex = '-1'; // Ensure moving person stays behind markers
   
   // Create the new person path
   const movingPersonPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -286,8 +290,8 @@ export default function decorate(block) {
   // Add all layers to SVG in the correct order
   svg.appendChild(roadLayer);
   svg.appendChild(stopsLayer);
-  svg.appendChild(checkpointMarkersLayer);
-  svg.appendChild(markerLayer);
+  svg.appendChild(markerLayer); // Moving person layer
+  svg.appendChild(checkpointMarkersLayer); // Checkpoint markers layer (on top)
   
   // Add SVG to container
   container.appendChild(svg);
@@ -339,6 +343,9 @@ export default function decorate(block) {
     const startPoint = roadPath.getPointAtLength(0);
     movingPerson.setAttribute('transform', `translate(${startPoint.x - 18.5}, ${startPoint.y - 44}) scale(3.5)`);
     
+    // Track previous progress for direction detection
+    let previousProgress = 0;
+    
     // Create scroll trigger
     const scrollTrigger = ScrollTrigger.create({
       trigger: container,
@@ -357,17 +364,31 @@ export default function decorate(block) {
           // Update moving person position
           movingPerson.setAttribute('transform', `translate(${point.x - 20.5}, ${point.y - 27}) scale(3.5)`);
           
-          // Show/hide checkpoint markers based on progress
+          // Determine if we're moving backwards
+          const isMovingBackwards = baseProgress < previousProgress;
+          
+          // Show/hide checkpoint markers based on progress and direction
           for (let i = 0; i < colorStops.length; i++) {
-            // If person has reached or passed this checkpoint
-            if (baseProgress >= colorStops[i].position) {
-              // Make the corresponding checkpoint marker visible
-              const checkpointMarker = document.querySelector(`.checkpoint-marker[data-position="${colorStops[i].position}"]`);
-              if (checkpointMarker) {
-                checkpointMarker.style.opacity = '1';
+            const checkpointMarker = document.querySelector(`.checkpoint-marker[data-position="${colorStops[i].position}"]`);
+            if (checkpointMarker) {
+              if (isMovingBackwards) {
+                // When moving backwards, only show markers up to the current position
+                if (baseProgress >= colorStops[i].position) {
+                  checkpointMarker.style.opacity = '1';
+                } else {
+                  checkpointMarker.style.opacity = '0';
+                }
+              } else {
+                // When moving forwards, show markers as before
+                if (baseProgress >= colorStops[i].position) {
+                  checkpointMarker.style.opacity = '1';
+                }
               }
             }
           }
+          
+          // Update previous progress for next comparison
+          previousProgress = baseProgress;
         }
       }
     });
