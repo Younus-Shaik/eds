@@ -5,12 +5,12 @@ export default function decorate(block) {
   
   // Create SVG element
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 1200 800');
+  svg.setAttribute('viewBox', '0 0 1200 600');
   svg.setAttribute('width', '100%');
   svg.setAttribute('height', '100%');
   
   // Create the path data (keeping the original path)
-  const pathData = 'M100,150 C250,150 250,450 400,450 S550,150 700,150 S850,450 1000,450 S1150,450 1150,450';
+  const pathData = 'M100,400 C200,200 350,500 450,200 C550,0 650,500 750,200 C850,0 950,250 1150,400';
 
    // Create the person silhouette
    const personPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -31,7 +31,7 @@ export default function decorate(block) {
   enablementPath.setAttribute('class', 'enablement-icon');
   
   const enablementMain = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  enablementMain.setAttribute('d', 'M12 4a1 1 0 0 0-1 1c0 1.692-2.046 2.54-3.243 1.343a1 1 0 1 0-1.414 1.414C7.54 8.954 6.693 11 5 11a1 1 0 1 0 0 2c1.692 0 2.54 2.046 1.343 3.243a1 1 0 0 0 1.414 1.414C8.954 16.46 11 17.307 11 19a1 1 0 1 0 2 0c0-1.692 2.046-2.54 3.243-1.343a1 1 0 1 0 1.414-1.414C16.46 15.046 17.307 13 19 13a1 1 0 1 0 0-2c-1.692 0-2.54-2.046-1.343-3.243a1 1 0 0 0-1.414-1.414C15.046 7.54 13 6.693 13 5a1 1 0 0 0-1-1zm-2.992.777a3 3 0 0 1 5.984 0 3 3 0 0 1 4.23 4.231 3 3 0 0 1 .001 5.984 3 3 0 0 1-4.231 4.23 3 3 0 0 1-5.984 0 3 3 0 0 1-4.231-4.23 3 3 0 0 1 0-5.984 3 3 0 0 1 4.231-4.231z');
+  enablementMain.setAttribute('d', 'M12 4a1 1 0 0 0-1 1c0 1.692-2.046 2.54-3.243 1.343a1 1 0 1 0-1.414 1.414C7.54 8.954 6.693 11 5 11a1 1 0 1 0 0 2c1.692 0 2.54 2.046 1.343 3.243a1 1 0 0 0 1.414 1.414C8.954 16.46 11 17.307 11 19a1 1 0 1 0 2 0c0-1.692 2.046-2.54 3.243-1.343a1 1 0 0 0 1.414-1.414C16.46 15.046 17.307 13 19 13a1 1 0 1 0 0-2c-1.692 0-2.54-2.046-1.343-3.243a1 1 0 0 0-1.414-1.414C15.046 7.54 13 6.693 13 5a1 1 0 0 0-1-1zm-2.992.777a3 3 0 0 1 5.984 0 3 3 0 0 1 4.23 4.231 3 3 0 0 1 .001 5.984 3 3 0 0 1-4.231 4.23 3 3 0 0 1-5.984 0 3 3 0 0 1-4.231-4.23 3 3 0 0 1 0-5.984 3 3 0 0 1 4.231-4.231z');
   enablementMain.setAttribute('fill', '#333333');
 
   const enablementCenter = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -114,16 +114,19 @@ export default function decorate(block) {
 
   // Define color stops for the marker
   const colorStops = [
-    { position: 0.0, path: personPath, color: '#FF5500' },
-    { position: 0.25, path: learnPath, color: '#4CAF50' },
-    { position: 0.5, path: enablementPath, color: '#2196F3' },
-    { position: 0.75, path: deploymentPath, color: '#9C27B0' },
-    { position: 1.0, path: scrollerHatPath, color: '#FF9800' }
+    { position: 0.0, path: personPath, title: "Welcome", content: "Start your journey on the roadmap", color: '#FF5500' },
+    { position: 0.25, path: learnPath, title: "Learning Phase", content: "Acquire essential knowledge and skills", color: '#4CAF50' },
+    { position: 0.5, path: enablementPath, title: "Enablement", content: "Get the tools and resources you need", color: '#2196F3' },
+    { position: 0.75, path: deploymentPath, title: "Deployment", content: "Put your knowledge into practice", color: '#9C27B0' },
+    { position: 1.0, path: scrollerHatPath, title: "Mastery", content: "Achieve complete mastery and mentor others", color: '#FF9800' }
   ];
 
   // Define layers for proper stacking - this is key to prevent visual issues
   const roadLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   roadLayer.setAttribute('id', 'road-layer');
+  
+  const stopsLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  stopsLayer.setAttribute('id', 'stops-layer');
   
   const markerLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   markerLayer.setAttribute('id', 'marker-layer');
@@ -131,19 +134,19 @@ export default function decorate(block) {
   // Create road shadow
   const roadShadow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   roadShadow.setAttribute('d', pathData);
-  roadShadow.setAttribute('stroke', '#BBBBBB');
-  roadShadow.setAttribute('stroke-width', '55');
+  roadShadow.setAttribute('stroke', '#CCCCCC');
+  roadShadow.setAttribute('stroke-width', '45');
   roadShadow.setAttribute('fill', 'none');
   roadShadow.setAttribute('stroke-linecap', 'round');
   roadShadow.setAttribute('stroke-linejoin', 'round');
-  roadShadow.setAttribute('transform', 'translate(5, 8)');
+  roadShadow.setAttribute('transform', 'translate(4, 6)');
   
   // Create main road
   const road = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   road.setAttribute('id', 'roadPath');
   road.setAttribute('d', pathData);
-  road.setAttribute('stroke', '#222222');
-  road.setAttribute('stroke-width', '50');
+  road.setAttribute('stroke', '#333333');
+  road.setAttribute('stroke-width', '40');
   road.setAttribute('fill', 'none');
   road.setAttribute('stroke-linecap', 'round');
   road.setAttribute('stroke-linejoin', 'round');
@@ -152,14 +155,52 @@ export default function decorate(block) {
   const laneMarkings = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   laneMarkings.setAttribute('d', pathData);
   laneMarkings.setAttribute('stroke', '#FFFFFF');
-  laneMarkings.setAttribute('stroke-width', '4');
-  laneMarkings.setAttribute('stroke-dasharray', '20 15');
+  laneMarkings.setAttribute('stroke-width', '3');
+  laneMarkings.setAttribute('stroke-dasharray', '10 10');
   laneMarkings.setAttribute('fill', 'none');
   
   // Add roads to road layer
   roadLayer.appendChild(roadShadow);
   roadLayer.appendChild(road);
   roadLayer.appendChild(laneMarkings);
+  
+  // Create stop points
+  function createStopPoint(position) {
+    const roadPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    roadPath.setAttribute('d', pathData);
+    const pathLength = roadPath.getTotalLength();
+    const point = roadPath.getPointAtLength(position * pathLength);
+    
+    // Create stop marker
+    const stopPoint = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    
+    // Outer circle (white border)
+    const outerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    outerCircle.setAttribute('cx', point.x);
+    outerCircle.setAttribute('cy', point.y);
+    outerCircle.setAttribute('r', '12');
+    outerCircle.setAttribute('fill', 'white');
+    outerCircle.setAttribute('stroke', '#E1E1E1');
+    outerCircle.setAttribute('stroke-width', '1');
+    
+    // Inner circle
+    const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    innerCircle.setAttribute('cx', point.x);
+    innerCircle.setAttribute('cy', point.y);
+    innerCircle.setAttribute('r', '6');
+    innerCircle.setAttribute('fill', '#1473E6'); // Adobe blue
+    
+    stopPoint.appendChild(outerCircle);
+    stopPoint.appendChild(innerCircle);
+    
+    return stopPoint;
+  }
+  
+  // Add stop points for each color stop position
+  for (let i = 0; i < colorStops.length; i++) {
+    const stopPoint = createStopPoint(colorStops[i].position);
+    stopsLayer.appendChild(stopPoint);
+  }
   
   // Create moving marker (the car/indicator)
   const marker = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -178,8 +219,6 @@ export default function decorate(block) {
   innerCircle.setAttribute('ry', '11.125');
   innerCircle.setAttribute('fill', 'white');
   
- 
-  
   // Add all elements to the marker group
   marker.appendChild(pinPath);
   marker.appendChild(innerCircle);
@@ -192,6 +231,7 @@ export default function decorate(block) {
   
   // Add all layers to SVG in the correct order
   svg.appendChild(roadLayer);
+  svg.appendChild(stopsLayer);
   svg.appendChild(markerLayer);
   
   // Add SVG to container
@@ -245,7 +285,7 @@ export default function decorate(block) {
     marker.setAttribute('transform', `translate(${startPoint.x - 19.5}, ${startPoint.y - 75}) scale(2)`);
     
     // Create scroll trigger
-    ScrollTrigger.create({
+    const scrollTrigger = ScrollTrigger.create({
       trigger: container,
       start: "top top",
       end: "+=3000",

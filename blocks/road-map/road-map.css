@@ -11,15 +11,15 @@
 }
 
 .learn-icon {
-    transform: translate(0.5%, 0.8%) scale(1.2);
+    transform: translate(0.5%, 1%) scale(1.2);
 }
 
 .enablement-icon {
-    transform: translate(.4%, .5%) scale(.9);
+    transform: translate(.4%, .7%) scale(.9);
 }
 
 .deployment-icon {
-    transform: translate(.5%, .7%) scale(.59);
+    transform: translate(.5%, 1%) scale(.59);
 }
 
 .scroller-hat-icon {
