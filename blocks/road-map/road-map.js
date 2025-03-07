@@ -311,58 +311,52 @@ export default function decorate(block) {
       document.head.appendChild(gsapScript);
       
       gsapScript.onload = () => {
-        // Load ScrollTrigger
-        const scrollTriggerScript = document.createElement('script');
-        scrollTriggerScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
-        document.head.appendChild(scrollTriggerScript);
+        // Load ScrollTrigger and MotionPathPlugin
+        const pluginsLoader = Promise.all([
+          new Promise(res => {
+            const scrollTriggerScript = document.createElement('script');
+            scrollTriggerScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
+            document.head.appendChild(scrollTriggerScript);
+            scrollTriggerScript.onload = res;
+          }),
+          new Promise(res => {
+            const motionPathScript = document.createElement('script');
+            motionPathScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js';
+            document.head.appendChild(motionPathScript);
+            motionPathScript.onload = res;
+          })
+        ]);
         
-        scrollTriggerScript.onload = resolve;
+        pluginsLoader.then(resolve);
       };
     });
   }
   
   function initAnimation() {
-    // Register ScrollTrigger
-    gsap.registerPlugin(ScrollTrigger);
+    // Register plugins
+    gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
     
     // Get the road path element for calculations
     const roadPath = document.getElementById('roadPath');
     const pathLength = roadPath.getTotalLength();
     
-    // Create an array of points for smoother animation
-    const points = [];
-    const totalPoints = 1000; // Large number for smoother animation
-    
-    for (let i = 0; i <= totalPoints; i++) {
-      const progress = i / totalPoints;
-      const point = roadPath.getPointAtLength(progress * pathLength);
-      points.push({ x: point.x, y: point.y });
-    }
-    
-    // Position person at start
-    const startPoint = roadPath.getPointAtLength(0);
-    movingPerson.setAttribute('transform', `translate(${startPoint.x - 18.5}, ${startPoint.y - 44}) scale(3.5)`);
-    
     // Track previous progress for direction detection
     let previousProgress = 0;
     
-    // Create scroll trigger
-    const scrollTrigger = ScrollTrigger.create({
-      trigger: container,
-      start: "top top",
-      end: "+=3000",
-      scrub: 0.5,
-      pin: true,
-      onUpdate: self => {
-        const baseProgress = self.progress || 0;
-        const adjustedProgress = Math.min(1, baseProgress * 1.01);
-        const pointIndex = Math.floor(adjustedProgress * totalPoints);
-        
-        if (pointIndex >= 0 && pointIndex <= totalPoints && points[pointIndex]) {
-          const point = points[pointIndex];
-          
-          // Update moving person position
-          movingPerson.setAttribute('transform', `translate(${point.x - 20.5}, ${point.y - 27}) scale(3.5)`);
+    // Set initial position at the start of the path
+    const startPoint = roadPath.getPointAtLength(0);
+    movingPerson.setAttribute('transform', `translate(${startPoint.x - 20.5}, ${startPoint.y - 27}) scale(3.5)`);
+    
+    // Create a timeline for motion path animation
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container,
+        start: "top top",
+        end: "+=3000",
+        scrub: 0.8, // Smoother scrubbing for better path following
+        pin: true,
+        onUpdate: self => {
+          const baseProgress = self.progress || 0;
           
           // Determine if we're moving backwards
           const isMovingBackwards = baseProgress < previousProgress;
@@ -391,6 +385,20 @@ export default function decorate(block) {
           previousProgress = baseProgress;
         }
       }
+    });
+    
+    // Use motionPath to follow the road exactly
+    tl.to(movingPerson, {
+      motionPath: {
+        path: roadPath,
+        align: roadPath,
+        alignOrigin: [0.5, 0.5],
+        autoRotate: false,  // We don't need rotation for the person
+        start: 0,
+        end: 1
+      },
+      ease: "none",
+      immediateRender: true
     });
     
     // Add debug panel if needed
