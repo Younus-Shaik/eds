@@ -196,42 +196,95 @@ export default function decorate(block) {
     return stopPoint;
   }
   
-  // Add stop points for each color stop position
+  // Create stop points for each color stop position
   for (let i = 0; i < colorStops.length; i++) {
     const stopPoint = createStopPoint(colorStops[i].position);
     stopsLayer.appendChild(stopPoint);
   }
   
-  // Create moving marker (the car/indicator)
-  const marker = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  marker.classList.add('marker');
+  // Create checkpoint markers (fixed pin and ellipse at each point)
+  const checkpointMarkersLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  checkpointMarkersLayer.setAttribute('id', 'checkpoint-markers-layer');
   
-  // Create the pin shape
-  const pinPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  pinPath.setAttribute('d', 'M30.66 19C28.415 26.625 15.788 38.125 15.788 38.125C15.788 38.125 0.529 26.5 0.038 18.25C-0.587 7.75 6.538 0.625 15.788 0C25.038 0.75 32.413 9 30.66 19Z');
-  pinPath.setAttribute('fill', '#FF5500');
+  // Create checkpoint markers at each color stop
+  const checkpointMarkers = [];
+  for (let i = 0; i < colorStops.length; i++) {
+    const roadPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    roadPath.setAttribute('d', pathData);
+    const pathLength = roadPath.getTotalLength();
+    const point = roadPath.getPointAtLength(colorStops[i].position * pathLength);
+    
+    // Create checkpoint marker (pin and ellipse)
+    const checkpointMarker = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    checkpointMarker.classList.add('checkpoint-marker');
+    checkpointMarker.setAttribute('data-position', colorStops[i].position);
+    
+    // Create the pin shape
+    const pinPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    pinPath.setAttribute('d', 'M30.66 19C28.415 26.625 15.788 38.125 15.788 38.125C15.788 38.125 0.529 26.5 0.038 18.25C-0.587 7.75 6.538 0.625 15.788 0C25.038 0.75 32.413 9 30.66 19Z');
+    pinPath.setAttribute('fill', colorStops[i].color);
+    
+    // Create the white circle background
+    const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+    innerCircle.setAttribute('cx', '15.66');
+    innerCircle.setAttribute('cy', '15.625');
+    innerCircle.setAttribute('rx', '11.25');
+    innerCircle.setAttribute('ry', '11.125');
+    innerCircle.setAttribute('fill', 'white');
+    
+    // Add elements to the checkpoint marker
+    checkpointMarker.appendChild(pinPath);
+    checkpointMarker.appendChild(innerCircle);
+    
+    // Add the checkpoint-specific icon
+    if (i > 0) { // Skip the person icon for the first checkpoint (it will be the moving element)
+      const iconPath = colorStops[i].path.cloneNode(true);
+      iconPath.classList.add('checkpoint-icon');
+      checkpointMarker.appendChild(iconPath);
+    } else {
+      // For the first checkpoint, add a clone of the person icon
+      const personIconClone = personPath.cloneNode(true);
+      personIconClone.classList.add('checkpoint-icon');
+      personIconClone.classList.add('person-icon');
+      checkpointMarker.appendChild(personIconClone);
+    }
+    
+    // Position and scale the checkpoint marker
+    checkpointMarker.setAttribute('transform', `translate(${point.x - 31}, ${point.y - 75}) scale(2)`);
+    
+    // Initially hide all checkpoint markers except the first one
+    if (i > 0) {
+      checkpointMarker.style.opacity = '0';
+      checkpointMarker.style.transition = 'opacity 0.5s ease';
+    }
+    
+    checkpointMarkersLayer.appendChild(checkpointMarker);
+    checkpointMarkers.push(checkpointMarker);
+  }
   
-  // Create the white circle background
-  const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-  innerCircle.setAttribute('cx', '15.66');
-  innerCircle.setAttribute('cy', '15.625');
-  innerCircle.setAttribute('rx', '11.25');
-  innerCircle.setAttribute('ry', '11.125');
-  innerCircle.setAttribute('fill', 'white');
+  // Create moving person (only the person silhouette will move)
+  const movingPerson = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  movingPerson.classList.add('moving-person');
+  movingPerson.setAttribute('fill', 'red');
   
-  // Add all elements to the marker group
-  marker.appendChild(pinPath);
-  marker.appendChild(innerCircle);
-  marker.appendChild(personPath);
+  // Clone the person silhouette for the moving element
+  const movingPersonPath = personPath.cloneNode(true);
+  movingPersonPath.classList.add('current-icon');
+  movingPersonPath.classList.add('person-icon');
+  movingPersonPath.setAttribute('fill', '#FF0000');  // Setting the person icon to red
   
-  // Scale and center the marker
-  marker.setAttribute('transform', 'translate(-15.5, -75) scale(2)');
+  // Add person to the moving group
+  movingPerson.appendChild(movingPersonPath);
   
-  markerLayer.appendChild(marker);
+  // Scale and initially position the moving person
+  movingPerson.setAttribute('transform', 'translate(-15.5, -75) scale(2)');
+  
+  markerLayer.appendChild(movingPerson);
   
   // Add all layers to SVG in the correct order
   svg.appendChild(roadLayer);
   svg.appendChild(stopsLayer);
+  svg.appendChild(checkpointMarkersLayer);
   svg.appendChild(markerLayer);
   
   // Add SVG to container
@@ -280,9 +333,9 @@ export default function decorate(block) {
       points.push({ x: point.x, y: point.y });
     }
     
-    // Position marker at start
+    // Position person at start
     const startPoint = roadPath.getPointAtLength(0);
-    marker.setAttribute('transform', `translate(${startPoint.x - 31}, ${startPoint.y - 75}) scale(2)`);
+    movingPerson.setAttribute('transform', `translate(${startPoint.x - 31}, ${startPoint.y - 75}) scale(2)`);
     
     // Create scroll trigger
     const scrollTrigger = ScrollTrigger.create({
@@ -298,27 +351,19 @@ export default function decorate(block) {
         
         if (pointIndex >= 0 && pointIndex <= totalPoints && points[pointIndex]) {
           const point = points[pointIndex];
-          // Update marker position using transform
-          const scale = baseProgress > 0.98 ? 2 : 2;
-          marker.setAttribute('transform', `translate(${point.x - 31.5}, ${point.y - 75}) scale(${scale})`);
           
-          // Update marker icon and color based on progress
-          for (let i = colorStops.length - 1; i >= 0; i--) {
+          // Update moving person position
+          movingPerson.setAttribute('transform', `translate(${point.x - 31.5}, ${point.y - 75}) scale(2)`);
+          
+          // Show/hide checkpoint markers based on progress
+          for (let i = 0; i < colorStops.length; i++) {
+            // If person has reached or passed this checkpoint
             if (baseProgress >= colorStops[i].position) {
-              // Remove existing path
-              const currentIcon = marker.querySelector('.current-icon');
-              if (currentIcon) {
-                marker.removeChild(currentIcon);
+              // Make the corresponding checkpoint marker visible
+              const checkpointMarker = document.querySelector(`.checkpoint-marker[data-position="${colorStops[i].position}"]`);
+              if (checkpointMarker) {
+                checkpointMarker.style.opacity = '1';
               }
-              
-              // Clone and add new path
-              const newPath = colorStops[i].path.cloneNode(true);
-              newPath.classList.add('current-icon');
-              marker.appendChild(newPath);
-
-              // Update pin color
-              pinPath.setAttribute('fill', colorStops[i].color);
-              break;
             }
           }
         }
@@ -341,7 +386,7 @@ export default function decorate(block) {
       setInterval(() => {
         const st = ScrollTrigger.getAll()[0];
         const progress = st ? st.progress : 0;
-        const markerBBox = marker.getBBox();
+        const markerBBox = movingPerson.getBBox();
         debugPanel.innerHTML = `Progress: ${(progress * 100).toFixed(1)}%<br>Pos: (${markerBBox.x + markerBBox.width/2}, ${markerBBox.y + markerBBox.height/2})`;
       }, 100);
     }
