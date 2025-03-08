@@ -2,6 +2,11 @@ export default function decorate(block) {
   // Create the container for our roadmap
   const container = document.createElement('div');
   container.className = 'roadmap-container';
+  container.style.position = 'relative';
+  container.style.width = '100%';
+  container.style.maxHeight = '800px';
+  container.style.margin = '0 auto';
+  container.style.overflow = 'hidden';
   
   // Create SVG element
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -114,11 +119,11 @@ export default function decorate(block) {
 
   // Define color stops for the marker
   const colorStops = [
-    { position: 0.0, path: personPath, title: "Welcome", content: "Start your journey on the roadmap", color: '#FF5500' },
-    { position: 0.25, path: learnPath, title: "Learning Phase", content: "Acquire essential knowledge and skills", color: '#4CAF50' },
-    { position: 0.5, path: enablementPath, title: "Enablement", content: "Get the tools and resources you need", color: '#2196F3' },
-    { position: 0.75, path: deploymentPath, title: "Deployment", content: "Put your knowledge into practice", color: '#9C27B0' },
-    { position: 1.0, path: scrollerHatPath, title: "Mastery", content: "Achieve complete mastery and mentor others", color: '#FF9800' }
+    { position: 0.0, path: personPath, title: "Interview Process", content: ["Complete screening application", "Attend technical interview", "Meet with hiring manager"], color: '#FF5500' },
+    { position: 0.25, path: learnPath, title: "Training On Tech", content: ["Learn fundamentals of web development", "Practice with Adobe tools", "Complete assigned tutorials"], color: '#4CAF50' },
+    { position: 0.5, path: enablementPath, title: "Enablement", content: ["Access to Adobe Creative Cloud", "System configuration", "Permission setup for development"], color: '#2196F3' },
+    { position: 0.75, path: deploymentPath, title: "Live Project", content: ["Collaborate with team members", "Implement customer features", "Present progress in sprint reviews"], color: '#9C27B0' },
+    { position: 1.0, path: scrollerHatPath, title: "Completion Of Apprenticeship", content: ["Final project presentation", "Manager evaluation", "Certificate of completion"], color: '#FF9800' }
   ];
 
   // Define layers for proper stacking - this is key to prevent visual issues
@@ -252,15 +257,300 @@ export default function decorate(block) {
       checkpointMarker.appendChild(personIconClone);
     }
     
-    // Position and scale the checkpoint marker
-    checkpointMarker.setAttribute('transform', `translate(${point.x - 31}, ${point.y - 75}) scale(2)`);
+    // Create a foreign object for the dialogue box
+    const foreignObject = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
     
-    // Initially hide all checkpoint markers except the first one
+    // Calculate size based on content - decrease the size further
+    const boxWidth = 90;  // Reduced from 110
+    const boxHeight = 65;  // Reduced from 80
+    
+    // Position the dialogue box with more spacing between them
+    if (i % 2 === 0) {
+      // Above the checkpoint
+      if (i === 0) {
+        // First checkpoint (Interview Process) - position to the right and higher
+        foreignObject.setAttribute('x', '0');
+        foreignObject.setAttribute('y', '-120');
+      } else if (i === colorStops.length - 1) {
+        // Last checkpoint (Completion) - position to the left and higher
+        foreignObject.setAttribute('x', '-90');
+        foreignObject.setAttribute('y', '-180');
+      } else {
+        // Standard above positioning for other checkpoints - move much higher up
+        foreignObject.setAttribute('x', '-65');
+        foreignObject.setAttribute('y', '-150');
+      }
+    } else {
+      // Below the checkpoint - position lower but not too far
+      foreignObject.setAttribute('x', '-75');
+      foreignObject.setAttribute('y', '90');
+    }
+    
+    foreignObject.setAttribute('width', boxWidth);
+    foreignObject.setAttribute('height', boxHeight);
+    foreignObject.setAttribute('class', 'dialogue-box');
+    foreignObject.setAttribute('data-position', colorStops[i].position);
+    
+    // Create HTML content for the foreign object - Adobe style improvements
+    const htmlDiv = document.createElement('div');
+    htmlDiv.style.width = '100%';
+    htmlDiv.style.height = '100%';
+    htmlDiv.style.backgroundColor = 'white';
+    htmlDiv.style.border = 'none';
+    htmlDiv.style.borderRadius = '10px';  // Slightly reduced from 12px
+    htmlDiv.style.padding = '7px';  // Reduced from 10px
+    htmlDiv.style.boxSizing = 'border-box';
+    htmlDiv.style.position = 'relative';
+    htmlDiv.style.boxShadow = '0 3px 8px rgba(0, 0, 0, 0.09)';  // Lighter shadow
+    htmlDiv.style.fontFamily = '"Adobe Clean", "Helvetica Neue", Helvetica, Arial, sans-serif';
+    htmlDiv.style.fontSize = '10px';  // Reduced from 11px
+    htmlDiv.style.color = '#4B4B4B';
+    htmlDiv.style.overflow = 'hidden';
+    htmlDiv.style.transition = 'transform 0.3s, box-shadow 0.3s';
+    
+    // Add a gradient background instead of solid color - making it more subtle
+    htmlDiv.style.background = `linear-gradient(135deg, white 0%, #FCFCFC 100%)`;
+    
+    // Add the speech bubble pointer/tail
+    const pointer = document.createElement('div');
+    pointer.style.position = 'absolute';
+    
+    // Position the pointer based on whether the dialogue is above or below
+    if (i % 2 === 0) {
+      // For dialogue boxes above the line
+      pointer.style.bottom = '-6px';  // Reduced from -8px
+      pointer.style.left = '50%';
+      pointer.style.marginLeft = '-6px';  // Reduced from -8px
+      pointer.style.width = '12px';  // Reduced from 16px
+      pointer.style.height = '6px';  // Reduced from 8px
+      pointer.style.overflow = 'hidden';
+      
+      const pointerInner = document.createElement('div');
+      pointerInner.style.position = 'absolute';
+      pointerInner.style.top = '-6px';  // Reduced from -8px
+      pointerInner.style.left = '0';
+      pointerInner.style.width = '12px';  // Reduced from 16px
+      pointerInner.style.height = '12px';  // Reduced from 16px
+      pointerInner.style.transform = 'rotate(45deg)';
+      pointerInner.style.backgroundColor = 'white';
+      pointerInner.style.boxShadow = '0 3px 8px rgba(0, 0, 0, 0.09)';  // Match the lighter shadow
+      pointer.appendChild(pointerInner);
+    } else {
+      // For dialogue boxes below the line
+      pointer.style.top = '-6px';  // Reduced from -8px
+      pointer.style.left = '50%';
+      pointer.style.marginLeft = '-6px';  // Reduced from -8px
+      pointer.style.width = '12px';  // Reduced from 16px
+      pointer.style.height = '6px';  // Reduced from 8px
+      pointer.style.overflow = 'hidden';
+      
+      const pointerInner = document.createElement('div');
+      pointerInner.style.position = 'absolute';
+      pointerInner.style.bottom = '-6px';  // Reduced from -8px
+      pointerInner.style.left = '0';
+      pointerInner.style.width = '12px';  // Reduced from 16px
+      pointerInner.style.height = '12px';  // Reduced from 16px
+      pointerInner.style.transform = 'rotate(45deg)';
+      pointerInner.style.backgroundColor = 'white';
+      pointerInner.style.boxShadow = '0 3px 8px rgba(0, 0, 0, 0.09)';  // Match the lighter shadow
+      pointer.appendChild(pointerInner);
+    }
+    
+    htmlDiv.appendChild(pointer);
+    
+    // Create icon + heading container for better layout
+    const headerContainer = document.createElement('div');
+    headerContainer.style.display = 'flex';
+    headerContainer.style.alignItems = 'center';
+    headerContainer.style.marginBottom = '5px';  // Reduced from 8px
+    
+    // Create a circular icon badge with the checkpoint color
+    const iconBadge = document.createElement('div');
+    iconBadge.style.width = '16px';  // Reduced from 22px
+    iconBadge.style.height = '16px';  // Reduced from 22px
+    iconBadge.style.borderRadius = '50%';
+    iconBadge.style.backgroundColor = colorStops[i].color;
+    iconBadge.style.display = 'flex';
+    iconBadge.style.alignItems = 'center';
+    iconBadge.style.justifyContent = 'center';
+    iconBadge.style.marginRight = '5px';  // Reduced from 8px
+    iconBadge.style.flexShrink = '0';
+    
+    // Add step number in the badge
+    const stepNumber = document.createElement('span');
+    stepNumber.textContent = (i + 1).toString();
+    stepNumber.style.color = 'white';
+    stepNumber.style.fontSize = '6px';  // Reduced from 9px
+    stepNumber.style.fontWeight = 'bold';
+    iconBadge.appendChild(stepNumber);
+    
+    // Create heading with clean styling
+    const heading = document.createElement('h3');
+    heading.textContent = colorStops[i].title;
+    heading.style.margin = '0';
+    heading.style.fontSize = '7px';  // Reduced from 11px
+    heading.style.fontWeight = '600';
+    heading.style.color = '#262626';
+    heading.style.flexGrow = '1';
+    heading.setAttribute('aria-label', `Checkpoint: ${colorStops[i].title}`);
+    
+    headerContainer.appendChild(iconBadge);
+    headerContainer.appendChild(heading);
+    
+    // Add progress bar for visual interest
+    const progressBar = document.createElement('div');
+    progressBar.style.width = '100%';
+    progressBar.style.height = '1px';  // Reduced from 2px
+    progressBar.style.backgroundColor = '#F5F5F5';  // Lighter background
+    progressBar.style.borderRadius = '1px';
+    progressBar.style.marginBottom = '5px';  // Reduced from 8px
+    
+    const progressFill = document.createElement('div');
+    progressFill.style.width = `${(i+1)/(colorStops.length)*100}%`;
+    progressFill.style.height = '100%';
+    progressFill.style.backgroundColor = colorStops[i].color;
+    progressFill.style.opacity = '0.7';  // Added opacity to make it more subtle
+    progressFill.style.borderRadius = '1px';
+    
+    progressBar.appendChild(progressFill);
+    
+    // Create a custom list with icons
+    const contentContainer = document.createElement('div');
+    contentContainer.style.display = 'flex';
+    contentContainer.style.flexDirection = 'column';
+    
+    // Only show first two items to save space
+    const displayItems = colorStops[i].content.slice(0, 2);
+    displayItems.forEach(item => {
+      const itemRow = document.createElement('div');
+      itemRow.style.display = 'flex';
+      itemRow.style.alignItems = 'flex-start';
+      itemRow.style.marginBottom = '3px';  // Reduced from 6px
+      
+      // Create a custom checkmark icon
+      const checkIcon = document.createElement('span');
+      checkIcon.innerHTML = '&#10003;'; // Checkmark symbol
+      checkIcon.style.color = colorStops[i].color;
+      checkIcon.style.marginRight = '3px';
+      checkIcon.style.fontSize = '5px';  // Reduced from 8px
+      
+      // For the text content
+      const textSpan = document.createElement('span');
+      // Truncate text if too long
+      let displayText = item;
+      if (displayText.length > 24) {
+        displayText = displayText.substring(0, 22) + '...';
+      }
+      textSpan.textContent = displayText;
+      textSpan.style.fontSize = '5px';  // Reduced from 9px
+      textSpan.style.lineHeight = '1.2';  // Reduced from 1.3
+      textSpan.style.color = '#505050';
+      textSpan.setAttribute('title', item); // For tooltip on hover
+      
+      itemRow.appendChild(checkIcon);
+      itemRow.appendChild(textSpan);
+      contentContainer.appendChild(itemRow);
+    });
+    
+    // Add a more items indicator if needed
+    if (colorStops[i].content.length > 2) {
+      const moreRow = document.createElement('div');
+      moreRow.style.display = 'flex';
+      moreRow.style.justifyContent = 'center';
+      moreRow.style.marginTop = '2px';
+      
+      const dotsContainer = document.createElement('div');
+      dotsContainer.style.display = 'flex';
+      dotsContainer.style.gap = '3px';
+      
+      // Add three dots for a more visually interesting "more" indicator
+      for (let j = 0; j < 3; j++) {
+        const dot = document.createElement('div');
+        dot.style.width = '4px';
+        dot.style.height = '4px';
+        dot.style.borderRadius = '50%';
+        dot.style.backgroundColor = colorStops[i].color;
+        dot.style.opacity = '0.6';
+        dotsContainer.appendChild(dot);
+      }
+      
+      moreRow.appendChild(dotsContainer);
+      contentContainer.appendChild(moreRow);
+    }
+    
+    // For active checkpoint, add special styling
+    if (colorStops[i].active) {
+      // Add a pulsing animation to the active checkpoint - but more subtle
+      htmlDiv.style.animation = 'pulse 3s infinite';  // Slower animation (3s vs 2s)
+      const keyframes = `
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(${hexToRgb(colorStops[i].color)}, 0.3); }
+          70% { box-shadow: 0 0 0 4px rgba(${hexToRgb(colorStops[i].color)}, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(${hexToRgb(colorStops[i].color)}, 0); }
+        }
+      `;
+      
+      // Add the keyframes to the document
+      const style = document.createElement('style');
+      style.textContent = keyframes;
+      document.head.appendChild(style);
+      
+      // Add "You are here" ribbon - smaller
+      const ribbon = document.createElement('div');
+      ribbon.textContent = 'HERE';
+      ribbon.style.position = 'absolute';
+      ribbon.style.top = '5px';
+      ribbon.style.right = '-18px';
+      ribbon.style.backgroundColor = colorStops[i].color;
+      ribbon.style.color = 'white';
+      ribbon.style.fontSize = '5px';  // Reduced from 6px
+      ribbon.style.padding = '2px 18px';
+      ribbon.style.transform = 'rotate(45deg)';
+      ribbon.style.transformOrigin = 'center right';
+      ribbon.style.fontWeight = 'bold';
+      ribbon.style.letterSpacing = '0.05em';
+      ribbon.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)';
+      ribbon.style.opacity = '0.85';
+      htmlDiv.appendChild(ribbon);
+    }
+    
+    // Function to convert hex to rgb for animation
+    function hexToRgb(hex) {
+      // Remove # if present
+      hex = hex.replace('#', '');
+      
+      // Parse the hex values
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      
+      return `${r}, ${g}, ${b}`;
+    }
+    
+    // Add all elements to the main container
+    htmlDiv.appendChild(headerContainer);
+    htmlDiv.appendChild(progressBar);
+    htmlDiv.appendChild(contentContainer);
+    
+    // Add the dialogue box to the marker
+    foreignObject.appendChild(htmlDiv);
+    checkpointMarker.appendChild(foreignObject);
+    
+    // Initially hide all markers and dialogue boxes except the first one
     if (i > 0) {
       checkpointMarker.style.opacity = '0';
       checkpointMarker.style.transition = 'opacity 0.5s ease';
+      foreignObject.style.display = 'none';
+    } else {
+      // For the first checkpoint (Interview Process), show the marker but hide the dialogue box
+      checkpointMarker.style.opacity = '1';
+      foreignObject.style.display = 'none';
     }
     
+    // Position and scale the checkpoint marker
+    checkpointMarker.setAttribute('transform', `translate(${point.x - 31}, ${point.y - 75}) scale(2)`);
+    
+    // Add to DOM
     checkpointMarkersLayer.appendChild(checkpointMarker);
     checkpointMarkers.push(checkpointMarker);
   }
@@ -299,6 +589,87 @@ export default function decorate(block) {
   // Replace block content with our container
   block.textContent = '';
   block.appendChild(container);
+  
+  // Add viewport toggle switch - move this after container is created
+  const viewportToggle = document.createElement('div');
+  viewportToggle.className = 'viewport-toggle';
+  viewportToggle.style.position = 'absolute';
+  viewportToggle.style.top = '20px';
+  viewportToggle.style.right = '20px';
+  viewportToggle.style.zIndex = '100';
+  viewportToggle.style.background = 'rgba(255, 255, 255, 0.8)';
+  viewportToggle.style.padding = '5px 10px';
+  viewportToggle.style.borderRadius = '20px';
+  viewportToggle.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+  viewportToggle.style.display = 'flex';
+  viewportToggle.style.alignItems = 'center';
+  viewportToggle.style.cursor = 'pointer';
+  viewportToggle.style.fontFamily = '"Adobe Clean", sans-serif';
+  viewportToggle.style.fontSize = '12px';
+  
+  // Create toggle switch
+  const toggleSwitch = document.createElement('span');
+  toggleSwitch.className = 'toggle-switch';
+  toggleSwitch.style.display = 'inline-block';
+  toggleSwitch.style.width = '36px';
+  toggleSwitch.style.height = '18px';
+  toggleSwitch.style.backgroundColor = '#ccc';
+  toggleSwitch.style.borderRadius = '9px';
+  toggleSwitch.style.marginLeft = '8px';
+  toggleSwitch.style.position = 'relative';
+  toggleSwitch.style.transition = 'background-color 0.3s';
+  
+  // Create toggle knob
+  const toggleKnob = document.createElement('span');
+  toggleKnob.className = 'toggle-knob';
+  toggleKnob.style.position = 'absolute';
+  toggleKnob.style.top = '2px';
+  toggleKnob.style.left = '2px';
+  toggleKnob.style.width = '14px';
+  toggleKnob.style.height = '14px';
+  toggleKnob.style.backgroundColor = 'white';
+  toggleKnob.style.borderRadius = '50%';
+  toggleKnob.style.transition = 'left 0.3s';
+  toggleKnob.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.3)';
+  
+  // Add label
+  const toggleLabel = document.createElement('span');
+  toggleLabel.textContent = 'Follow Mode';
+  
+  // Set data attribute to track state
+  viewportToggle.setAttribute('data-enabled', 'true');
+  toggleSwitch.style.backgroundColor = '#2196F3';
+  toggleKnob.style.left = '20px';
+  
+  // Add elements to DOM
+  toggleSwitch.appendChild(toggleKnob);
+  viewportToggle.appendChild(toggleLabel);
+  viewportToggle.appendChild(toggleSwitch);
+  container.appendChild(viewportToggle);  // Add to container, not block
+  
+  // Add click event to toggle
+  viewportToggle.addEventListener('click', () => {
+    const isEnabled = viewportToggle.getAttribute('data-enabled') === 'true';
+    const newState = !isEnabled;
+    
+    // Update toggle appearance
+    viewportToggle.setAttribute('data-enabled', newState.toString());
+    toggleSwitch.style.backgroundColor = newState ? '#2196F3' : '#ccc';
+    toggleKnob.style.left = newState ? '20px' : '2px';
+    
+    // If turning off, reset viewBox to original
+    if (!newState && container.querySelector('svg')) {
+      const svgElement = container.querySelector('svg');
+      const svgWidth = svgElement.clientWidth;
+      const svgHeight = svgElement.clientHeight;
+      // Smoothly reset to original view
+      gsap.to(svgElement, {
+        attr: { viewBox: `0 0 ${svgWidth} ${svgHeight}` },
+        duration: 0.5,
+        ease: "power2.out"
+      });
+    }
+  });
   
   // Load GSAP for scrolling
   loadGSAP().then(() => initAnimation());
@@ -347,6 +718,20 @@ export default function decorate(block) {
     const startPoint = roadPath.getPointAtLength(0);
     movingPerson.setAttribute('transform', `translate(${startPoint.x - 20.5}, ${startPoint.y - 27}) scale(3.5)`);
     
+    // Get the SVG element for viewport manipulation
+    const svgElement = container.querySelector('svg');
+    
+    // Set initial viewBox to show the entire road map
+    const svgWidth = svgElement.clientWidth;
+    const svgHeight = svgElement.clientHeight;
+    svgElement.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+    
+    // Save original viewBox for reference
+    const originalViewBox = {
+      width: svgWidth,
+      height: svgHeight
+    };
+    
     // Create a timeline for motion path animation
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -361,21 +746,83 @@ export default function decorate(block) {
           // Determine if we're moving backwards
           const isMovingBackwards = baseProgress < previousProgress;
           
-          // Show/hide checkpoint markers based on progress and direction
+          // Get current position of the person along the path
+          const currentPathPoint = baseProgress * pathLength;
+          const personPoint = roadPath.getPointAtLength(currentPathPoint);
+          
+          // Only apply viewport tracking if it's enabled
+          const viewportToggle = document.querySelector('.viewport-toggle');
+          const isViewportTrackingEnabled = viewportToggle && viewportToggle.getAttribute('data-enabled') === 'true';
+          
+          if (isViewportTrackingEnabled) {
+            // Calculate zoom level based on progress (zoom in more as we progress)
+            // Scale between 1 (no zoom) and 3 (max zoom)
+            const zoomLevel = 1 + (baseProgress * 1.5);
+            
+            // Calculate the new viewBox width and height based on zoom level
+            const newViewBoxWidth = originalViewBox.width / zoomLevel;
+            const newViewBoxHeight = originalViewBox.height / zoomLevel;
+            
+            // Center the viewBox on the person's position, with some look-ahead
+            // Look-ahead increases as we progress to see more of what's coming
+            const lookAheadFactor = baseProgress * 0.2; // Increases as we progress
+            const lookAheadX = isMovingBackwards ? -lookAheadFactor * 100 : lookAheadFactor * 100;
+            
+            // Center point calculation with look-ahead
+            const centerX = Math.max(0, Math.min(svgWidth - newViewBoxWidth/2, personPoint.x + lookAheadX - newViewBoxWidth/2));
+            const centerY = Math.max(0, Math.min(svgHeight - newViewBoxHeight/2, personPoint.y - newViewBoxHeight/2));
+            
+            // Apply the new viewBox with smooth transition using GSAP
+            gsap.to(svgElement, {
+              attr: { 
+                viewBox: `${centerX} ${centerY} ${newViewBoxWidth} ${newViewBoxHeight}` 
+              },
+              duration: 0.3,
+              ease: "power1.out",
+              overwrite: "auto"
+            });
+          }
+          
+          // Show checkpoint markers and dialogue boxes based on progress
           for (let i = 0; i < colorStops.length; i++) {
             const checkpointMarker = document.querySelector(`.checkpoint-marker[data-position="${colorStops[i].position}"]`);
+            const dialogueBox = checkpointMarker.querySelector('.dialogue-box');
+            
             if (checkpointMarker) {
               if (isMovingBackwards) {
-                // When moving backwards, only show markers up to the current position
+                // When moving backwards, only show markers and dialogues up to the current position
                 if (baseProgress >= colorStops[i].position) {
                   checkpointMarker.style.opacity = '1';
+                  
+                  // Once a checkpoint is passed, keep its dialogue box visible
+                  if (dialogueBox) {
+                    // For the Interview Process (first checkpoint), only show dialogue
+                    // box when we have some progress (not at the very beginning)
+                    if (i === 0 && baseProgress < 0.03) {
+                      dialogueBox.style.display = 'none';
+                    } else {
+                      dialogueBox.style.display = 'block';
+                    }
+                  }
                 } else {
                   checkpointMarker.style.opacity = '0';
+                  if (dialogueBox) dialogueBox.style.display = 'none';
                 }
               } else {
                 // When moving forwards, show markers as before
                 if (baseProgress >= colorStops[i].position) {
                   checkpointMarker.style.opacity = '1';
+                  
+                  // Once a checkpoint is passed, keep its dialogue box visible
+                  if (dialogueBox) {
+                    // For the Interview Process (first checkpoint), only show dialogue
+                    // box when we have some progress (not at the very beginning)
+                    if (i === 0 && baseProgress < 0.03) {
+                      dialogueBox.style.display = 'none';
+                    } else {
+                      dialogueBox.style.display = 'block';
+                    }
+                  }
                 }
               }
             }
