@@ -322,13 +322,13 @@ export default function decorate(block) {
         // First checkpoint (Interview Process) - position to the right and higher
         setAttributes(foreignObject, {
           'x': '0',
-          'y': '-120'
+          'y': '-100'
         });
       } else if (i === colorStops.length - 1) {
         // Last checkpoint (Completion) - position to the bottom
         setAttributes(foreignObject, {
-          'x': '-75',
-          'y': '90'
+          'x': '-65',
+          'y': '70'
         });
       } else if (colorStops[i].position === 0.5) {
         // Enablement checkpoint - position to the bottom
@@ -336,17 +336,17 @@ export default function decorate(block) {
           'x': '-40',
           'y': '80'
         });
-      } else {
-        // Standard above positioning for other checkpoints - move much higher up
+      } else if(colorStops[i].position === 0.75){
+        // Live project checkpoint - position to the bottom
         setAttributes(foreignObject, {
-          'x': '-65',
-          'y': '-150'
+          'x': '-25',
+          'y': '-10'
         });
       }
     } else {
       // Below the checkpoint - position lower but not too far
       setAttributes(foreignObject, {
-        'x': '-75',
+        'x': '-45',
         'y': '90'
       });
     }
