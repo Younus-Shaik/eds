@@ -23,6 +23,9 @@ export default function decorate(block) {
   
   // Create the path data (keeping the original path)
   const pathData = 'M100,400 C200,200 350,500 450,200 C550,0 650,500 750,200 C850,0 950,250 1150,400';
+  
+  // Create a vertical path for mobile devices
+  const mobilePathData = 'M400,100 C200,200 500,350 200,450 C0,550 500,650 200,750 C0,850 250,950 400,1150';
 
    // Create the person silhouette
    const personPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -178,51 +181,57 @@ export default function decorate(block) {
   setAttributes(checkpointMarkersLayer, { 'id': 'checkpoint-markers-layer' });
   checkpointMarkersLayer.style.zIndex = '1'; // Ensure markers stay in front
   
-  // Create road shadow
+  // Create the road elements
   const roadShadow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   setAttributes(roadShadow, {
     'd': pathData,
-    'stroke': '#CCCCCC',
-    'stroke-width': '45',
-    'fill': 'none',
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-    'transform': 'translate(4, 6)'
+    'class': 'road-shadow',
+    'id': 'roadShadowPath'
   });
   
-  // Create main road
-  const road = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  setAttributes(road, {
-    'id': 'roadPath',
+  const roadMain = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  setAttributes(roadMain, {
     'd': pathData,
-    'stroke': '#333333',
-    'stroke-width': '40',
-    'fill': 'none',
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round'
+    'class': 'road-main'
   });
   
-  // Create lane markings
-  const laneMarkings = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  setAttributes(laneMarkings, {
+  const roadMarkings = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  setAttributes(roadMarkings, {
     'd': pathData,
-    'stroke': '#FFFFFF',
-    'stroke-width': '3',
-    'stroke-dasharray': '10 10',
-    'fill': 'none'
+    'class': 'road-markings'
   });
   
-  // Add roads to road layer
-  roadLayer.appendChild(roadShadow);
-  roadLayer.appendChild(road);
-  roadLayer.appendChild(laneMarkings);
+  // Add road elements to SVG
+  svg.appendChild(roadShadow);
+  svg.appendChild(roadMain);
+  svg.appendChild(roadMarkings);
+  
+  // Create the main path for animation
+  const roadPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  setAttributes(roadPath, {
+    'd': pathData,
+    'stroke': 'none',
+    'fill': 'none',
+    'id': 'roadPath'
+  });
+  svg.appendChild(roadPath);
+  
+  // Check if we're on mobile and update paths if needed
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    roadShadow.setAttribute('d', mobilePathData);
+    roadMain.setAttribute('d', mobilePathData);
+    roadMarkings.setAttribute('d', mobilePathData);
+    roadPath.setAttribute('d', mobilePathData);
+  }
   
   // Create stop points
   function createStopPoint(position) {
-    const roadPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    setAttributes(roadPath, { 'd': pathData });
-    const pathLength = roadPath.getTotalLength();
-    const point = roadPath.getPointAtLength(position * pathLength);
+    const roadPathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    // Use the appropriate path data based on device type
+    setAttributes(roadPathElement, { 'd': isMobile ? mobilePathData : pathData });
+    const pathLength = roadPathElement.getTotalLength();
+    const point = roadPathElement.getPointAtLength(position * pathLength);
     
     // Create stop marker
     const stopPoint = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -233,9 +242,7 @@ export default function decorate(block) {
       'cx': point.x.toString(),
       'cy': point.y.toString(),
       'r': '12',
-      'fill': 'white',
-      'stroke': '#E1E1E1',
-      'stroke-width': '1'
+      'class': 'stop-point-outer'
     });
     
     // Inner circle
@@ -244,7 +251,7 @@ export default function decorate(block) {
       'cx': point.x.toString(),
       'cy': point.y.toString(),
       'r': '6',
-      'fill': '#1473E6'
+      'class': 'stop-point-inner'
     });
     
     stopPoint.appendChild(outerCircle);
@@ -263,7 +270,8 @@ export default function decorate(block) {
   const checkpointMarkers = [];
   for (let i = 0; i < colorStops.length; i++) {
     const roadPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    setAttributes(roadPath, { 'd': pathData });
+    // Use the appropriate path data based on device type
+    setAttributes(roadPath, { 'd': isMobile ? mobilePathData : pathData });
     const pathLength = roadPath.getTotalLength();
     const point = roadPath.getPointAtLength(colorStops[i].position * pathLength);
     
@@ -316,39 +324,75 @@ export default function decorate(block) {
     const boxHeight = 65;  // Reduced from 80
     
     // Position the dialogue box with more spacing between them
-    if (i % 2 === 0) {
-      // Above the checkpoint
+    if (isMobile) {
+      // Mobile view - position dialogue boxes to the right of checkpoints for vertical path
       if (i === 0) {
-        // First checkpoint (Interview Process) - position to the right and higher
+        // First checkpoint (Interview Process)
         setAttributes(foreignObject, {
-          'x': '0',
-          'y': '-100'
+          'x': '50',
+          'y': '-20'
         });
       } else if (i === colorStops.length - 1) {
-        // Last checkpoint (Completion) - position to the bottom
+        // Last checkpoint (Completion)
         setAttributes(foreignObject, {
-          'x': '-65',
-          'y': '70'
+          'x': '50',
+          'y': '-20'
+        });
+      } else if (colorStops[i].position === 0.25) {
+        // Training checkpoint
+        setAttributes(foreignObject, {
+          'x': '50',
+          'y': '-20'
         });
       } else if (colorStops[i].position === 0.5) {
-        // Enablement checkpoint - position to the bottom
+        // Enablement checkpoint
         setAttributes(foreignObject, {
-          'x': '-40',
-          'y': '80'
+          'x': '50',
+          'y': '-20'
         });
-      } else if(colorStops[i].position === 0.75){
-        // Live project checkpoint - position to the bottom
+      } else if (colorStops[i].position === 0.75) {
+        // Live project checkpoint
         setAttributes(foreignObject, {
-          'x': '-25',
-          'y': '-10'
+          'x': '50',
+          'y': '-20'
         });
       }
     } else {
-      // Below the checkpoint - position lower but not too far
-      setAttributes(foreignObject, {
-        'x': '-45',
-        'y': '90'
-      });
+      // Desktop view - original positioning
+      if (i % 2 === 0) {
+        // Above the checkpoint
+        if (i === 0) {
+          // First checkpoint (Interview Process) - position to the right and higher
+          setAttributes(foreignObject, {
+            'x': '0',
+            'y': '-100'
+          });
+        } else if (i === colorStops.length - 1) {
+          // Last checkpoint (Completion) - position to the bottom
+          setAttributes(foreignObject, {
+            'x': '-65',
+            'y': '70'
+          });
+        } else if (colorStops[i].position === 0.5) {
+          // Enablement checkpoint - position to the bottom
+          setAttributes(foreignObject, {
+            'x': '-40',
+            'y': '80'
+          });
+        } else if(colorStops[i].position === 0.75){
+          // Live project checkpoint - position to the bottom
+          setAttributes(foreignObject, {
+            'x': '-25',
+            'y': '-10'
+          });
+        }
+      } else {
+        // Below the checkpoint - position lower but not too far
+        setAttributes(foreignObject, {
+          'x': '-45',
+          'y': '90'
+        });
+      }
     }
     
     setAttributes(foreignObject, {
@@ -568,8 +612,20 @@ export default function decorate(block) {
     // Register plugins
     gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
     
+    // Check if we're on mobile
+    const isMobile = window.innerWidth <= 768;
+    
     // Get the road path element for calculations
     const roadPath = document.getElementById('roadPath');
+    
+    // Update the path data for mobile if needed
+    if (isMobile) {
+      roadPath.setAttribute('d', mobilePathData);
+      // Update SVG viewBox for vertical orientation
+      const svgElement = container.querySelector('svg');
+      svgElement.setAttribute('viewBox', '0 0 600 1200');
+    }
+    
     const pathLength = roadPath.getTotalLength();
     
     // Track previous progress for direction detection
@@ -582,9 +638,6 @@ export default function decorate(block) {
     // Get the SVG element for viewport manipulation
     const svgElement = container.querySelector('svg');
     
-    // Check if we're on mobile
-    const isMobile = window.innerWidth <= 768;
-    
     // Set initial viewBox
     const svgWidth = svgElement.clientWidth;
     const svgHeight = svgElement.clientHeight;
@@ -593,8 +646,8 @@ export default function decorate(block) {
     if (isMobile) {
       // Set initial viewBox to focus on the start of the path
       const mobileViewBoxWidth = 400; // Narrower view for mobile
-      const mobileViewBoxHeight = 400; // Maintain aspect ratio
-      svgElement.setAttribute('viewBox', `${Math.max(0, startPoint.x - mobileViewBoxWidth/2)} ${Math.max(0, startPoint.y - mobileViewBoxHeight/2)} ${mobileViewBoxWidth} ${mobileViewBoxHeight}`);
+      const mobileViewBoxHeight = 600; // Taller view for vertical scrolling
+      svgElement.setAttribute('viewBox', `${Math.max(0, startPoint.x - mobileViewBoxWidth/2)} ${Math.max(0, startPoint.y - mobileViewBoxHeight/4)} ${mobileViewBoxWidth} ${mobileViewBoxHeight}`);
     } else {
       // Desktop view shows the entire roadmap
       svgElement.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
@@ -605,7 +658,7 @@ export default function decorate(block) {
       scrollTrigger: {
         trigger: container,
         start: "top top",
-        end: "+=3000",
+        end: isMobile ? "+=4000" : "+=3000", // Longer scrolling distance for mobile vertical path
         scrub: 0.8, // Smoother scrubbing for better path following
         pin: true,
         onUpdate: self => {
@@ -718,7 +771,40 @@ export default function decorate(block) {
       
       // Only update if the device type changed
       if (newIsMobile !== isMobile) {
-        // Force refresh by reloading the page
+        // Update all path elements with the appropriate path data
+        if (newIsMobile) {
+          // Switch to vertical mobile path
+          document.getElementById('roadPath').setAttribute('d', mobilePathData);
+          document.getElementById('roadShadowPath').setAttribute('d', mobilePathData);
+          document.querySelectorAll('.road-main, .road-markings').forEach(path => {
+            path.setAttribute('d', mobilePathData);
+          });
+          
+          // Update SVG viewBox for vertical orientation
+          const svgElement = container.querySelector('svg');
+          svgElement.setAttribute('viewBox', '0 0 600 1200');
+          
+          // Update container height
+          container.style.height = '150vh';
+          container.style.maxHeight = 'none';
+        } else {
+          // Switch back to horizontal desktop path
+          document.getElementById('roadPath').setAttribute('d', pathData);
+          document.getElementById('roadShadowPath').setAttribute('d', pathData);
+          document.querySelectorAll('.road-main, .road-markings').forEach(path => {
+            path.setAttribute('d', pathData);
+          });
+          
+          // Reset SVG viewBox
+          const svgElement = container.querySelector('svg');
+          svgElement.setAttribute('viewBox', '0 0 1200 600');
+          
+          // Reset container height
+          container.style.height = '100vh';
+          container.style.maxHeight = '800px';
+        }
+        
+        // Force refresh by reloading the page to reinitialize the animation
         window.location.reload();
       }
     });

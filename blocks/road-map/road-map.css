@@ -533,26 +533,58 @@
 .dialogue-hidden {
   display: none;
 }
+
 @media (width <= 768px) {
+  .roadmap-container {
+    height: 150vh; /* Taller container for vertical scrolling */
+    max-height: none; /* Remove max-height constraint on mobile */
+  }
    
-.checkpoint-marker .person-icon {
+  .checkpoint-marker .person-icon {
     transform: translate(.45%, .1%) scale(.9);
-}
+  }
 
-.checkpoint-marker .learn-icon {
+  .checkpoint-marker .learn-icon {
     transform: translate(1.5%, 1.5%) scale(1.2);
-}
+  }
 
-.checkpoint-marker .enablement-icon {
+  .checkpoint-marker .enablement-icon {
     transform: translate(1.2%, 1.2%) scale(.9);
-}
+  }
 
-.checkpoint-marker .deployment-icon {
+  .checkpoint-marker .deployment-icon {
     transform: translate(1.5%, 1.5%) scale(.59);
-}
+  }
 
-.checkpoint-marker .scroller-hat-icon {
+  .checkpoint-marker .scroller-hat-icon {
     transform: translate(1%, .9%) scale(.34);
-}
+  }
 
+  /* Adjust dialogue box positioning for vertical layout */
+  .dialogue-box {
+    width: 80px;
+    height: 65px;
+  }
+  
+  .dialogue-container {
+    font-size: 9px;
+  }
+  
+  /* Ensure all markers are visible */
+  .checkpoint-marker {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  
+  /* Adjust dialogue pointer for right-side positioning */
+  .dialogue-pointer-left {
+    left: -6px;
+    top: 50%;
+    margin-top: -6px;
+    margin-left: 0;
+  }
+  
+  .dialogue-pointer-left .dialogue-pointer-inner {
+    left: -6px;
+  }
 }
