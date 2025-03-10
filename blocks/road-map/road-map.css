@@ -114,7 +114,9 @@
 /* Dialogue box styles */
 .dialogue-box {
   width: 90px;
-  height: 65px;
+  height: 70px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.09), 0 1px 3px rgba(0, 0, 0, 0.12);
+  border-radius: .3rem;
 }
 
 .dialogue-container {
@@ -315,7 +317,6 @@
 .checkpoint-active {
   animation: pulse 3s infinite;
 }
-
 .checkpoint-ribbon {
   position: absolute;
   top: 5px;
@@ -329,4 +330,200 @@
   letter-spacing: 0.05em;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
   opacity: 0.85;
+}
+
+/* Controls container */
+.roadmap-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Debug panel styles */
+.debug-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(0,0,0,0.7);
+  color: white;
+  padding: 10px;
+  font-family: monospace;
+  z-index: 9999;
+}
+
+/* Header container styles */
+.dialogue-header-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+/* Icon badge styles */
+.dialogue-icon-badge {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+/* Step number styles */
+.dialogue-step-number {
+  color: white;
+  font-size: 6px;
+  font-weight: bold;
+}
+
+/* Heading styles */
+.dialogue-heading {
+  margin: 0;
+  font-size: 7px;
+  font-weight: 600;
+  color: #262626;
+  flex-grow: 1;
+}
+
+/* Content container styles */
+.dialogue-content-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Item row styles */
+.dialogue-item-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 3px;
+}
+
+/* Check icon styles */
+.dialogue-check-icon {
+  color: inherit;
+  margin-right: 3px;
+  font-size: 5px;
+}
+
+/* Text span styles */
+.dialogue-text-span {
+  font-size: 5px;
+  line-height: 1.2;
+  color: #505050;
+}
+
+/* More row styles */
+.dialogue-more-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+/* Dots container styles */
+.dialogue-dots-container {
+  display: flex;
+  gap: 3px;
+}
+
+/* Dot styles */
+.dialogue-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+/* Ribbon styles */
+.dialogue-ribbon {
+  position: absolute;
+  top: 5px;
+  right: -18px;
+  color: white;
+  font-size: 5px;
+  padding: 2px 18px;
+  transform: rotate(45deg);
+  transform-origin: center right;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  opacity: 0.85;
+}
+
+/* HTML container styles */
+.dialogue-html-container {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 7px;
+  box-sizing: border-box;
+  position: relative;
+  font-family: "Adobe Clean", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10px;
+  color: #4B4B4B;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  background: linear-gradient(135deg, white 0%, #FCFCFC 100%);
+}
+
+/* Pointer styles */
+.dialogue-pointer {
+  position: absolute;
+  width: 12px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.dialogue-pointer-top {
+  top: -6px;
+  left: 50%;
+  margin-left: -6px;
+}
+
+.dialogue-pointer-bottom {
+  bottom: -6px;
+  left: 50%;
+  margin-left: -6px;
+}
+
+.dialogue-pointer-inner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+  background-color: white;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.09);
+}
+
+.dialogue-pointer-top .dialogue-pointer-inner {
+  bottom: -6px;
+}
+
+.dialogue-pointer-bottom .dialogue-pointer-inner {
+  top: -6px;
+}
+
+/* Visibility state classes */
+.marker-visible {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.marker-hidden {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.dialogue-visible {
+  display: block;
+}
+
+.dialogue-hidden {
+  display: none;
 }
