@@ -272,9 +272,13 @@ export default function decorate(block) {
         foreignObject.setAttribute('x', '0');
         foreignObject.setAttribute('y', '-120');
       } else if (i === colorStops.length - 1) {
-        // Last checkpoint (Completion) - position to the left and higher
-        foreignObject.setAttribute('x', '-90');
-        foreignObject.setAttribute('y', '-180');
+        // Last checkpoint (Completion) - position to the bottom
+        foreignObject.setAttribute('x', '-75');
+        foreignObject.setAttribute('y', '90');
+      } else if (colorStops[i].position === 0.5) {
+        // Enablement checkpoint - position to the bottom
+        foreignObject.setAttribute('x', '-40');
+        foreignObject.setAttribute('y', '80');
       } else {
         // Standard above positioning for other checkpoints - move much higher up
         foreignObject.setAttribute('x', '-65');
