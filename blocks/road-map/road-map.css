@@ -81,9 +81,15 @@
 }
 
 .moving-person .person-icon {
-    transform: translate(.14%, .1%) scale(.9);
+    transform: translate(.14%, .1%) scale(.8);
     fill: #ff0000;
     fill-rule: evenodd;
+}
+
+.moving-person .background-circle {
+    fill: white;
+    stroke: #e0e0e0;
+    stroke-width: 0.5;
 }
 
 .checkpoint-icon {
@@ -96,7 +102,7 @@
 }
 
 .checkpoint-marker .learn-icon {
-    transform: translate(0.5%, 1%) scale(1.2);
+    transform: translate(0.5%, 0.9%) scale(1.2);
 }
 
 .checkpoint-marker .enablement-icon {
@@ -104,7 +110,7 @@
 }
 
 .checkpoint-marker .deployment-icon {
-    transform: translate(.5%, 1%) scale(.59);
+    transform: translate(.5%, .8%) scale(.59);
 }
 
 .checkpoint-marker .scroller-hat-icon {
@@ -526,4 +532,27 @@
 
 .dialogue-hidden {
   display: none;
+}
+@media (width <= 768px) {
+   
+.checkpoint-marker .person-icon {
+    transform: translate(.45%, .1%) scale(.9);
+}
+
+.checkpoint-marker .learn-icon {
+    transform: translate(1.5%, 1.5%) scale(1.2);
+}
+
+.checkpoint-marker .enablement-icon {
+    transform: translate(1.2%, 1.2%) scale(.9);
+}
+
+.checkpoint-marker .deployment-icon {
+    transform: translate(1.5%, 1.5%) scale(.59);
+}
+
+.checkpoint-marker .scroller-hat-icon {
+    transform: translate(1%, .9%) scale(.34);
+}
+
 }

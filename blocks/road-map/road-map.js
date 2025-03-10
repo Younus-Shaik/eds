@@ -488,6 +488,16 @@ export default function decorate(block) {
   movingPerson.setAttribute('fill', '#434343');
   movingPerson.style.zIndex = '-1'; // Ensure moving person stays behind markers
   
+  // Create background circle
+  const backgroundCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  backgroundCircle.setAttribute('cx', '8');
+  backgroundCircle.setAttribute('cy', '8');
+  backgroundCircle.setAttribute('r', '7.5');
+  backgroundCircle.classList.add('background-circle');
+  
+  // Add circle to the moving group
+  movingPerson.appendChild(backgroundCircle);
+  
   // Create the new person path
   const movingPersonPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   movingPersonPath.setAttribute('d', 'M9.855 10.053c-.423.571-1.834.719-1.834.719s-1.441-.142-1.865-.706c-2.035 0-3.098 2.923-3.098 2.923h9.926c0-.001-.838-2.936-3.129-2.936m.088-4.135C9.943 6.977 9.062 9 7.978 9 6.89 9 6.011 6.977 6.011 5.918S6.89 4 7.978 4c1.084 0 1.965.859 1.965 1.918m4.161 2.103c-.371.575-1.527.881-1.527.881s-1.355-.301-1.729-.867c0 0-.012.664-.577 1.436 1.8-.232 2.578 1.503 2.578 1.503l3.131.006c-.001-.001.139-2.959-1.876-2.959m-.114-3.488c0 .848-.662 2.465-1.479 2.465-.82 0-1.481-1.617-1.481-2.465 0-.846.663-1.533 1.481-1.533.817 0 1.479.688 1.479 1.533M1.918 8.021c.378.571 1.549.875 1.549.875s1.373-.299 1.748-.861c0 0 .014.66.586 1.426-1.824-.23-2.61 1.492-2.61 1.492l-3.17.005s-.143-2.937 1.897-2.937m.084-3.455c0 .828.664 2.411 1.479 2.411.819 0 1.48-1.583 1.48-2.411a1.49 1.49 0 0 0-1.48-1.501 1.49 1.49 0 0 0-1.479 1.501');
@@ -572,10 +582,23 @@ export default function decorate(block) {
     // Get the SVG element for viewport manipulation
     const svgElement = container.querySelector('svg');
     
-    // Set viewBox to show the entire road map
+    // Check if we're on mobile
+    const isMobile = window.innerWidth <= 768;
+    
+    // Set initial viewBox
     const svgWidth = svgElement.clientWidth;
     const svgHeight = svgElement.clientHeight;
-    svgElement.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+    
+    // For mobile, we'll use a different approach with a zoomed-in view that follows the path
+    if (isMobile) {
+      // Set initial viewBox to focus on the start of the path
+      const mobileViewBoxWidth = 400; // Narrower view for mobile
+      const mobileViewBoxHeight = 400; // Maintain aspect ratio
+      svgElement.setAttribute('viewBox', `${Math.max(0, startPoint.x - mobileViewBoxWidth/2)} ${Math.max(0, startPoint.y - mobileViewBoxHeight/2)} ${mobileViewBoxWidth} ${mobileViewBoxHeight}`);
+    } else {
+      // Desktop view shows the entire roadmap
+      svgElement.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
+    }
     
     // Create a timeline for motion path animation
     const tl = gsap.timeline({
@@ -594,6 +617,25 @@ export default function decorate(block) {
           // Get current position of the person along the path
           const currentPathPoint = baseProgress * pathLength;
           const personPoint = roadPath.getPointAtLength(currentPathPoint);
+          
+          // For mobile view, update the viewBox to follow the person
+          if (isMobile) {
+            const mobileViewBoxWidth = 400;
+            const mobileViewBoxHeight = 400;
+            
+            // Calculate new viewBox position centered on the current person position
+            const newX = Math.max(0, personPoint.x - mobileViewBoxWidth/2);
+            const newY = Math.max(0, personPoint.y - mobileViewBoxHeight/2);
+            
+            // Smoothly update the viewBox to follow the person
+            gsap.to(svgElement, {
+              attr: { 
+                viewBox: `${newX} ${newY} ${mobileViewBoxWidth} ${mobileViewBoxHeight}` 
+              },
+              duration: 0.3,
+              overwrite: "auto"
+            });
+          }
           
           // Show checkpoint markers and dialogue boxes based on progress
           for (let i = 0; i < colorStops.length; i++) {
@@ -668,6 +710,17 @@ export default function decorate(block) {
       },
       ease: "none",
       immediateRender: true
+    });
+    
+    // Handle window resize to update mobile/desktop view
+    window.addEventListener('resize', () => {
+      const newIsMobile = window.innerWidth <= 768;
+      
+      // Only update if the device type changed
+      if (newIsMobile !== isMobile) {
+        // Force refresh by reloading the page
+        window.location.reload();
+      }
     });
     
     // Add debug panel if needed
