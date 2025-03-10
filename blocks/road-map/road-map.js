@@ -594,87 +594,18 @@ export default function decorate(block) {
   block.textContent = '';
   block.appendChild(container);
   
-  // Add viewport toggle switch - move this after container is created
-  const viewportToggle = document.createElement('div');
-  viewportToggle.className = 'viewport-toggle';
-  viewportToggle.style.position = 'absolute';
-  viewportToggle.style.top = '20px';
-  viewportToggle.style.right = '20px';
-  viewportToggle.style.zIndex = '100';
-  viewportToggle.style.background = 'rgba(255, 255, 255, 0.8)';
-  viewportToggle.style.padding = '5px 10px';
-  viewportToggle.style.borderRadius = '20px';
-  viewportToggle.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
-  viewportToggle.style.display = 'flex';
-  viewportToggle.style.alignItems = 'center';
-  viewportToggle.style.cursor = 'pointer';
-  viewportToggle.style.fontFamily = '"Adobe Clean", sans-serif';
-  viewportToggle.style.fontSize = '12px';
-  
-  // Create toggle switch
-  const toggleSwitch = document.createElement('span');
-  toggleSwitch.className = 'toggle-switch';
-  toggleSwitch.style.display = 'inline-block';
-  toggleSwitch.style.width = '36px';
-  toggleSwitch.style.height = '18px';
-  toggleSwitch.style.backgroundColor = '#ccc';
-  toggleSwitch.style.borderRadius = '9px';
-  toggleSwitch.style.marginLeft = '8px';
-  toggleSwitch.style.position = 'relative';
-  toggleSwitch.style.transition = 'background-color 0.3s';
-  
-  // Create toggle knob
-  const toggleKnob = document.createElement('span');
-  toggleKnob.className = 'toggle-knob';
-  toggleKnob.style.position = 'absolute';
-  toggleKnob.style.top = '2px';
-  toggleKnob.style.left = '2px';
-  toggleKnob.style.width = '14px';
-  toggleKnob.style.height = '14px';
-  toggleKnob.style.backgroundColor = 'white';
-  toggleKnob.style.borderRadius = '50%';
-  toggleKnob.style.transition = 'left 0.3s';
-  toggleKnob.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.3)';
-  
-  // Add label
-  const toggleLabel = document.createElement('span');
-  toggleLabel.textContent = 'Follow Mode';
-  
-  // Set data attribute to track state
-  viewportToggle.setAttribute('data-enabled', 'true');
-  toggleSwitch.style.backgroundColor = '#2196F3';
-  toggleKnob.style.left = '20px';
-  
-  // Add elements to DOM
-  toggleSwitch.appendChild(toggleKnob);
-  viewportToggle.appendChild(toggleLabel);
-  viewportToggle.appendChild(toggleSwitch);
-  container.appendChild(viewportToggle);  // Add to container, not block
-  
-  // Add click event to toggle
-  viewportToggle.addEventListener('click', () => {
-    const isEnabled = viewportToggle.getAttribute('data-enabled') === 'true';
-    const newState = !isEnabled;
-    
-    // Update toggle appearance
-    viewportToggle.setAttribute('data-enabled', newState.toString());
-    toggleSwitch.style.backgroundColor = newState ? '#2196F3' : '#ccc';
-    toggleKnob.style.left = newState ? '20px' : '2px';
-    
-    // If turning off, reset viewBox to original
-    if (!newState && container.querySelector('svg')) {
-      const svgElement = container.querySelector('svg');
-      const svgWidth = svgElement.clientWidth;
-      const svgHeight = svgElement.clientHeight;
-      // Smoothly reset to original view
-      gsap.to(svgElement, {
-        attr: { viewBox: `0 0 ${svgWidth} ${svgHeight}` },
-        duration: 0.5,
-        ease: "power2.out"
-      });
-    }
-  });
-  
+  // Create the controls container
+  const controls = document.createElement('div');
+  controls.className = 'roadmap-controls';
+  controls.style.position = 'absolute';
+  controls.style.top = '20px';
+  controls.style.right = '20px';
+  controls.style.zIndex = '10';
+  controls.style.display = 'flex';
+  controls.style.flexDirection = 'column';
+  controls.style.gap = '10px';
+  container.appendChild(controls);
+
   // Load GSAP for scrolling
   loadGSAP().then(() => initAnimation());
   
@@ -725,16 +656,10 @@ export default function decorate(block) {
     // Get the SVG element for viewport manipulation
     const svgElement = container.querySelector('svg');
     
-    // Set initial viewBox to show the entire road map
+    // Set viewBox to show the entire road map
     const svgWidth = svgElement.clientWidth;
     const svgHeight = svgElement.clientHeight;
     svgElement.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
-    
-    // Save original viewBox for reference
-    const originalViewBox = {
-      width: svgWidth,
-      height: svgHeight
-    };
     
     // Create a timeline for motion path animation
     const tl = gsap.timeline({
@@ -753,39 +678,6 @@ export default function decorate(block) {
           // Get current position of the person along the path
           const currentPathPoint = baseProgress * pathLength;
           const personPoint = roadPath.getPointAtLength(currentPathPoint);
-          
-          // Only apply viewport tracking if it's enabled
-          const viewportToggle = document.querySelector('.viewport-toggle');
-          const isViewportTrackingEnabled = viewportToggle && viewportToggle.getAttribute('data-enabled') === 'true';
-          
-          if (isViewportTrackingEnabled) {
-            // Calculate zoom level based on progress (zoom in more as we progress)
-            // Scale between 1 (no zoom) and 3 (max zoom)
-            const zoomLevel = 1 + (baseProgress * 1.5);
-            
-            // Calculate the new viewBox width and height based on zoom level
-            const newViewBoxWidth = originalViewBox.width / zoomLevel;
-            const newViewBoxHeight = originalViewBox.height / zoomLevel;
-            
-            // Center the viewBox on the person's position, with some look-ahead
-            // Look-ahead increases as we progress to see more of what's coming
-            const lookAheadFactor = baseProgress * 0.2; // Increases as we progress
-            const lookAheadX = isMovingBackwards ? -lookAheadFactor * 100 : lookAheadFactor * 100;
-            
-            // Center point calculation with look-ahead
-            const centerX = Math.max(0, Math.min(svgWidth - newViewBoxWidth/2, personPoint.x + lookAheadX - newViewBoxWidth/2));
-            const centerY = Math.max(0, Math.min(svgHeight - newViewBoxHeight/2, personPoint.y - newViewBoxHeight/2));
-            
-            // Apply the new viewBox with smooth transition using GSAP
-            gsap.to(svgElement, {
-              attr: { 
-                viewBox: `${centerX} ${centerY} ${newViewBoxWidth} ${newViewBoxHeight}` 
-              },
-              duration: 0.3,
-              ease: "power1.out",
-              overwrite: "auto"
-            });
-          }
           
           // Show checkpoint markers and dialogue boxes based on progress
           for (let i = 0; i < colorStops.length; i++) {
