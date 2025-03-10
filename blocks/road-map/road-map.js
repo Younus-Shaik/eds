@@ -329,25 +329,25 @@ export default function decorate(block) {
       if (i === 0) {
         // First checkpoint (Interview Process)
         setAttributes(foreignObject, {
-          'x': '50',
+          'x': '-110',
           'y': '-20'
         });
       } else if (i === colorStops.length - 1) {
         // Last checkpoint (Completion)
         setAttributes(foreignObject, {
-          'x': '50',
-          'y': '-20'
+          'x': '35',
+          'y': '-40'
         });
       } else if (colorStops[i].position === 0.25) {
         // Training checkpoint
         setAttributes(foreignObject, {
-          'x': '50',
-          'y': '-20'
+          'x': '-90',
+          'y': '-50'
         });
       } else if (colorStops[i].position === 0.5) {
         // Enablement checkpoint
         setAttributes(foreignObject, {
-          'x': '50',
+          'x': '40',
           'y': '-20'
         });
       } else if (colorStops[i].position === 0.75) {

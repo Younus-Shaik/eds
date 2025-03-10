@@ -518,12 +518,14 @@
 /* Visibility state classes */
 .marker-visible {
   opacity: 1;
-  transition: opacity 0.5s ease-in-out;
+  visibility: visible;
+  transition: opacity 0.5s ease-in-out, visibility 0s linear 0s;
 }
 
 .marker-hidden {
   opacity: 0;
-  transition: opacity 0.5s ease-in-out;
+  visibility: hidden;
+  transition: opacity 0.5s ease-in-out, visibility 0s linear 0.5s;
 }
 
 .dialogue-visible {
@@ -563,17 +565,11 @@
   /* Adjust dialogue box positioning for vertical layout */
   .dialogue-box {
     width: 80px;
-    height: 65px;
+    height: 70px;
   }
   
   .dialogue-container {
     font-size: 9px;
-  }
-  
-  /* Ensure all markers are visible */
-  .checkpoint-marker {
-    opacity: 1 !important;
-    visibility: visible !important;
   }
   
   /* Adjust dialogue pointer for right-side positioning */
