@@ -537,6 +537,9 @@
 }
 
 @media (width <= 768px) {
+  .moving-person .person-icon {
+    transform: translate(.4%, .1%) scale(.8);
+}
   .roadmap-container {
     height: 150vh; /* Taller container for vertical scrolling */
     max-height: none; /* Remove max-height constraint on mobile */
