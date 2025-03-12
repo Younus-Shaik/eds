@@ -292,8 +292,8 @@ export default async function decorate(block) {
       const foreignObject = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
       
       // Calculate size based on content - decrease the size further
-      const boxWidth = 90;  // Reduced from 110
-      const boxHeight = 65;  // Reduced from 80
+      const boxWidth = 90; 
+      const boxHeight = 65; 
       
       // Position the dialogue box with more spacing between them
       if (isMobile) {
@@ -374,7 +374,7 @@ export default async function decorate(block) {
         'data-position': colorStops[i].position.toString()
       });
       
-      // Create HTML content for the foreign object - Adobe style improvements
+      // Create HTML content for the foreign object 
       const htmlDiv = document.createElement('div');
       htmlDiv.className = 'dialogue-html-container';
       
@@ -440,25 +440,6 @@ export default async function decorate(block) {
         itemRow.appendChild(textSpan);
         contentContainer.appendChild(itemRow);
       });
-      
-      // Create more row if needed
-      if (colorStops[i].content.length > 2) {
-        const moreRow = document.createElement('div');
-        moreRow.className = 'dialogue-more-row';
-        
-        const dotsContainer = document.createElement('div');
-        dotsContainer.className = 'dialogue-dots-container';
-        
-        for (let j = 0; j < 3; j++) {
-          const dot = document.createElement('div');
-          dot.className = 'dialogue-dot';
-          dot.style.backgroundColor = colorStops[i].color;
-          dotsContainer.appendChild(dot);
-        }
-        
-        moreRow.appendChild(dotsContainer);
-        contentContainer.appendChild(moreRow);
-      }
       
       // Create ribbon for active checkpoint
       const ribbon = document.createElement('div');
@@ -738,10 +719,6 @@ export default async function decorate(block) {
         }
       });
       
-      /**
-       * Updates layout elements for the current device type
-       * @param {boolean} isMobile - Whether the current view is mobile
-       */
       function updateLayoutForDeviceType(isMobile) {
         const paths = [
           document.getElementById('roadPath'),
@@ -768,26 +745,7 @@ export default async function decorate(block) {
         initDebugPanel();
       }
     }
-
-    /**
-     * Initializes debug panel for development and testing
-     * Shows real-time progress and position information
-     */
-    function initDebugPanel() {
-      const debugPanel = document.createElement('div');
-      debugPanel.className = 'debug-panel';
-      document.body.appendChild(debugPanel);
-      
-      setInterval(() => {
-        const st = ScrollTrigger.getAll()[0];
-        const progress = st ? st.progress : 0;
-        const markerBBox = movingPerson.getBBox();
-        debugPanel.innerHTML = 
-          `Progress: ${(progress * 100).toFixed(1)}%<br>
-           Pos: (${markerBBox.x + markerBBox.width/2}, 
-                 ${markerBBox.y + markerBBox.height/2})`;
-      }, 100);
-    }
+    
   } catch (error) {
     console.error('Error loading icons:', error);
     // Insert a simple error message into the container
