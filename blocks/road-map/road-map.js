@@ -23,11 +23,11 @@ async function loadSvgIcon(iconPath) {
 }
 
 export default async function decorate(block) {
-  // Create the container for our roadmap
+  // Create the main container for the roadmap
   const container = document.createElement('div');
   container.className = 'roadmap-container';
   
-  // Create SVG element
+  // Initialize SVG canvas with viewBox for responsive scaling
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   setAttributes(svg, {
     'viewBox': '0 0 1200 600',
@@ -35,13 +35,11 @@ export default async function decorate(block) {
     'height': '100%'
   });
   
-  // Create the path data (keeping the original path)
+  // Define path data for desktop and mobile views
   const pathData = 'M100,400 C200,200 350,500 450,200 C550,0 650,500 750,200 C850,0 950,250 1150,400';
-  
-  // Create a vertical path for mobile devices
   const mobilePathData = 'M400,100 C200,200 500,350 200,450 C0,550 500,650 200,750 C0,850 250,950 400,1150';
 
-  // Load all the icons from external SVG files
+  // Define paths for SVG icons used in checkpoints
   const iconPaths = {
     person: '/icons/person.svg',
     book: '/icons/book.svg',
@@ -50,11 +48,12 @@ export default async function decorate(block) {
     hat: '/icons/hat.svg'
   };
 
-  // Load icons and extract paths/groups
+  // Load and process SVG icons
   const loadedIcons = {};
   let iconLoadError = false;
 
   try {
+    // Load all icons in parallel
     const [personIcon, bookIcon, enablementIcon, deploymentIcon, hatIcon] = await Promise.all([
       loadSvgIcon(iconPaths.person),
       loadSvgIcon(iconPaths.book),
@@ -63,7 +62,8 @@ export default async function decorate(block) {
       loadSvgIcon(iconPaths.hat)
     ]);
 
-    // Process person icon
+    // Process each icon and set its attributes
+    // Person icon processing
     if (personIcon) {
       loadedIcons.personPath = personIcon.querySelector('path');
       setAttributes(loadedIcons.personPath, {
@@ -74,7 +74,7 @@ export default async function decorate(block) {
       iconLoadError = true;
     }
 
-    // Process book icon
+    // Book icon processing
     if (bookIcon) {
       loadedIcons.learnPath = bookIcon.querySelector('path');
       setAttributes(loadedIcons.learnPath, {
@@ -86,7 +86,7 @@ export default async function decorate(block) {
       iconLoadError = true;
     }
 
-    // Process enablement icon
+    // Enablement icon processing
     if (enablementIcon) {
       loadedIcons.enablementPath = enablementIcon.querySelector('g');
       setAttributes(loadedIcons.enablementPath, {
@@ -97,7 +97,7 @@ export default async function decorate(block) {
       iconLoadError = true;
     }
 
-    // Process deployment icon
+    // Deployment icon processing
     if (deploymentIcon) {
       loadedIcons.deploymentPath = deploymentIcon.querySelector('g');
       setAttributes(loadedIcons.deploymentPath, {
@@ -108,7 +108,7 @@ export default async function decorate(block) {
       iconLoadError = true;
     }
 
-    // Process graduation hat icon
+    // Graduation hat icon processing
     if (hatIcon) {
       loadedIcons.scrollerHatPath = hatIcon.querySelector('g');
       setAttributes(loadedIcons.scrollerHatPath, {
@@ -123,16 +123,22 @@ export default async function decorate(block) {
       console.warn('One or more icons failed to load. Please check the icon paths.');
     }
 
-    // Define color stops for the marker with the loaded icons
+    // Define checkpoint data with positions, colors, and content
     const colorStops = [
-      { position: 0.0, path: loadedIcons.personPath, title: "Interview Process", content: ["Complete screening application", "Attend technical interview", "Meet with hiring manager"], color: '#FF5500' },
+      {
+        position: 0.0,
+        path: loadedIcons.personPath,
+        title: "Interview Process",
+        content: ["Complete screening application", "Attend technical interview", "Meet with hiring manager"],
+        color: '#FF5500'
+      },
       { position: 0.25, path: loadedIcons.learnPath, title: "Training On Tech", content: ["Learn fundamentals of web development", "Practice with Adobe tools", "Complete assigned tutorials"], color: '#4CAF50' },
       { position: 0.5, path: loadedIcons.enablementPath, title: "Enablement", content: ["Access to Adobe Creative Cloud", "System configuration", "Permission setup for development"], color: '#2196F3' },
       { position: 0.75, path: loadedIcons.deploymentPath, title: "Live Project", content: ["Collaborate with team members", "Implement customer features", "Present progress in sprint reviews"], color: '#9C27B0' },
       { position: 1.0, path: loadedIcons.scrollerHatPath, title: "Completion Of Apprenticeship", content: ["Final project presentation", "Manager evaluation", "Certificate of completion"], color: '#FF9800' }
     ];
 
-    // Define layers for proper stacking - this is key to prevent visual issues
+    // Create SVG layers for proper stacking order
     const roadLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     setAttributes(roadLayer, { 'id': 'road-layer' });
     
@@ -141,12 +147,11 @@ export default async function decorate(block) {
     
     const markerLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     setAttributes(markerLayer, { 'id': 'marker-layer' });
-    markerLayer.style.zIndex = '-1'; // Ensure moving person stays behind markers
+    markerLayer.style.zIndex = '-1';
     
-    // Create checkpoint markers (fixed pin and ellipse at each point)
     const checkpointMarkersLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     setAttributes(checkpointMarkersLayer, { 'id': 'checkpoint-markers-layer' });
-    checkpointMarkersLayer.style.zIndex = '1'; // Ensure markers stay in front
+    checkpointMarkersLayer.style.zIndex = '1';
     
     // Create the road elements
     const roadShadow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -575,156 +580,142 @@ export default async function decorate(block) {
       });
     }
     
+    /**
+     * Initializes the animation with GSAP
+     * Sets up ScrollTrigger and motion path animation
+     */
     function initAnimation() {
-      // Register plugins
+      // Register GSAP plugins for animation
       gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
       
-      // Check if we're on mobile
+      // Detect mobile device for responsive layout
       const isMobile = window.innerWidth <= 768;
       
-      // Get the road path element for calculations
+      // Get the road path element for motion calculations
       const roadPath = document.getElementById('roadPath');
       
-      // Update the path data for mobile if needed
+      // Update path data for mobile view if needed
       if (isMobile) {
         roadPath.setAttribute('d', mobilePathData);
-        // Update SVG viewBox for vertical orientation
+        // Adjust SVG viewBox for vertical orientation on mobile
         const svgElement = container.querySelector('svg');
         svgElement.setAttribute('viewBox', '0 0 600 1200');
       }
       
       const pathLength = roadPath.getTotalLength();
       
-      // Track previous progress for direction detection
+      // Track progress for direction detection
       let previousProgress = 0;
       
-      // Set initial position at the start of the path
+      // Initialize person position at the start of the path
       const startPoint = roadPath.getPointAtLength(0);
       movingPerson.setAttribute('transform', `translate(${startPoint.x - 20.5}, ${startPoint.y - 27}) scale(3.5)`);
       
-      // Get the SVG element for viewport manipulation
+      // Configure viewport settings
       const svgElement = container.querySelector('svg');
-      
-      // Set initial viewBox
       const svgWidth = svgElement.clientWidth;
       const svgHeight = svgElement.clientHeight;
       
-      // For mobile, we'll use a different approach with a zoomed-in view that follows the path
+      // Set up mobile-specific viewport configuration
       if (isMobile) {
-        // Set initial viewBox to focus on the start of the path
-        const mobileViewBoxWidth = 400; // Narrower view for mobile
-        const mobileViewBoxHeight = 600; // Taller view for vertical scrolling
-        svgElement.setAttribute('viewBox', `${Math.max(0, startPoint.x - mobileViewBoxWidth/2)} ${Math.max(0, startPoint.y - mobileViewBoxHeight/4)} ${mobileViewBoxWidth} ${mobileViewBoxHeight}`);
+        const mobileViewBoxWidth = 400;
+        const mobileViewBoxHeight = 600;
+        svgElement.setAttribute('viewBox', 
+          `${Math.max(0, startPoint.x - mobileViewBoxWidth/2)} 
+           ${Math.max(0, startPoint.y - mobileViewBoxHeight/4)} 
+           ${mobileViewBoxWidth} 
+           ${mobileViewBoxHeight}`
+        );
       } else {
-        // Desktop view shows the entire roadmap
+        // Desktop viewport shows the entire roadmap
         svgElement.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
       }
       
-      // Create a timeline for motion path animation
+      /**
+       * Creates the main animation timeline with ScrollTrigger
+       * Handles viewport updates and checkpoint visibility
+       */
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
           start: "top top",
-          end: isMobile ? "+=4000" : "+=3000", // Longer scrolling distance for mobile vertical path
-          scrub: 0.8, // Smoother scrubbing for better path following
+          end: isMobile ? "+=4000" : "+=3000", // Longer scroll for mobile
+          scrub: 0.8, // Smooth scrolling animation
           pin: true,
           onUpdate: self => {
             const baseProgress = self.progress || 0;
-            
-            // Determine if we're moving backwards
             const isMovingBackwards = baseProgress < previousProgress;
             
-            // Get current position of the person along the path
+            // Calculate current position along the path
             const currentPathPoint = baseProgress * pathLength;
             const personPoint = roadPath.getPointAtLength(currentPathPoint);
             
-            // For mobile view, update the viewBox to follow the person
+            // Update mobile viewport to follow the person
             if (isMobile) {
               const mobileViewBoxWidth = 400;
               const mobileViewBoxHeight = 400;
               
-              // Calculate new viewBox position centered on the current person position
+              // Center viewport on current person position
               const newX = Math.max(0, personPoint.x - mobileViewBoxWidth/2);
               const newY = Math.max(0, personPoint.y - mobileViewBoxHeight/2);
               
-              // Smoothly update the viewBox to follow the person
+              // Smooth viewport transition
               gsap.to(svgElement, {
-                attr: { 
-                  viewBox: `${newX} ${newY} ${mobileViewBoxWidth} ${mobileViewBoxHeight}` 
-                },
+                attr: { viewBox: `${newX} ${newY} ${mobileViewBoxWidth} ${mobileViewBoxHeight}` },
                 duration: 0.3,
                 overwrite: "auto"
               });
             }
             
-            // Show checkpoint markers and dialogue boxes based on progress
-            for (let i = 0; i < colorStops.length; i++) {
-              const checkpointMarker = document.querySelector(`.checkpoint-marker[data-position="${colorStops[i].position}"]`);
-              const dialogueBox = checkpointMarker.querySelector('.dialogue-box');
-              
-              if (checkpointMarker) {
-                if (isMovingBackwards) {
-                  // When moving backwards, only show markers and dialogues up to the current position
-                  if (baseProgress >= colorStops[i].position) {
-                    checkpointMarker.classList.remove('marker-hidden');
-                    checkpointMarker.classList.add('marker-visible');
-                    
-                    // Once a checkpoint is passed, keep its dialogue box visible
-                    if (dialogueBox) {
-                      // For the Interview Process (first checkpoint), only show dialogue
-                      // box when we have some progress (not at the very beginning)
-                      if (i === 0 && baseProgress < 0.03) {
-                        dialogueBox.classList.remove('dialogue-visible');
-                        dialogueBox.classList.add('dialogue-hidden');
-                      } else {
-                        dialogueBox.classList.remove('dialogue-hidden');
-                        dialogueBox.classList.add('dialogue-visible');
-                      }
-                    }
-                  } else {
-                    checkpointMarker.classList.remove('marker-visible');
-                    checkpointMarker.classList.add('marker-hidden');
-                    if (dialogueBox) {
-                      dialogueBox.classList.remove('dialogue-visible');
-                      dialogueBox.classList.add('dialogue-hidden');
-                    }
-                  }
-                } else {
-                  // When moving forwards, show markers as before
-                  if (baseProgress >= colorStops[i].position) {
-                    checkpointMarker.classList.remove('marker-hidden');
-                    checkpointMarker.classList.add('marker-visible');
-                    
-                    // Once a checkpoint is passed, keep its dialogue box visible
-                    if (dialogueBox) {
-                      // For the Interview Process (first checkpoint), only show dialogue
-                      // box when we have some progress (not at the very beginning)
-                      if (i === 0 && baseProgress < 0.03) {
-                        dialogueBox.classList.remove('dialogue-visible');
-                        dialogueBox.classList.add('dialogue-hidden');
-                      } else {
-                        dialogueBox.classList.remove('dialogue-hidden');
-                        dialogueBox.classList.add('dialogue-visible');
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            // Update checkpoint visibility based on scroll progress
+            updateCheckpointVisibility(baseProgress, isMovingBackwards);
             
-            // Update previous progress for next comparison
             previousProgress = baseProgress;
           }
         }
       });
       
-      // Use motionPath to follow the road exactly
+      function updateCheckpointVisibility(progress, isMovingBackwards) {
+        colorStops.forEach((stop, index) => {
+          const checkpointMarker = document.querySelector(
+            `.checkpoint-marker[data-position="${stop.position}"]`
+          );
+          const dialogueBox = checkpointMarker.querySelector('.dialogue-box');
+          
+          if (checkpointMarker) {
+            const shouldShow = isMovingBackwards ? 
+              progress >= stop.position : 
+              progress >= stop.position;
+            
+            // Toggle visibility classes
+            checkpointMarker.classList.toggle('marker-hidden', !shouldShow);
+            checkpointMarker.classList.toggle('marker-visible', shouldShow);
+            
+            // Handle dialogue box visibility
+            if (dialogueBox) {
+              const isFirstCheckpoint = index === 0;
+              const isAtStart = progress < 0.03;
+              
+              // Special handling for first checkpoint
+              if (isFirstCheckpoint && isAtStart) {
+                dialogueBox.classList.remove('dialogue-visible');
+                dialogueBox.classList.add('dialogue-hidden');
+              } else if (shouldShow) {
+                dialogueBox.classList.remove('dialogue-hidden');
+                dialogueBox.classList.add('dialogue-visible');
+              }
+            }
+          }
+        });
+      }
+      
+      // Configure motion path animation for the person
       tl.to(movingPerson, {
         motionPath: {
           path: roadPath,
           align: roadPath,
           alignOrigin: [0.5, 0.5],
-          autoRotate: false,  // We don't need rotation for the person
+          autoRotate: false,
           start: 0,
           end: 1
         },
@@ -732,63 +723,70 @@ export default async function decorate(block) {
         immediateRender: true
       });
       
-      // Handle window resize to update mobile/desktop view
+      /**
+       * Handle window resize events for responsive layout
+       * Reinitializes the animation when switching between mobile/desktop views
+       */
       window.addEventListener('resize', () => {
         const newIsMobile = window.innerWidth <= 768;
         
-        // Only update if the device type changed
+        // Only update if device type changed
         if (newIsMobile !== isMobile) {
-          // Update all path elements with the appropriate path data
-          if (newIsMobile) {
-            // Switch to vertical mobile path
-            document.getElementById('roadPath').setAttribute('d', mobilePathData);
-            document.getElementById('roadShadowPath').setAttribute('d', mobilePathData);
-            document.querySelectorAll('.road-main, .road-markings').forEach(path => {
-              path.setAttribute('d', mobilePathData);
-            });
-            
-            // Update SVG viewBox for vertical orientation
-            const svgElement = container.querySelector('svg');
-            svgElement.setAttribute('viewBox', '0 0 600 1200');
-            
-            // Update container height
-            container.style.height = '150vh';
-            container.style.maxHeight = 'none';
-          } else {
-            // Switch back to horizontal desktop path
-            document.getElementById('roadPath').setAttribute('d', pathData);
-            document.getElementById('roadShadowPath').setAttribute('d', pathData);
-            document.querySelectorAll('.road-main, .road-markings').forEach(path => {
-              path.setAttribute('d', pathData);
-            });
-            
-            // Reset SVG viewBox
-            const svgElement = container.querySelector('svg');
-            svgElement.setAttribute('viewBox', '0 0 1200 600');
-            
-            // Reset container height
-            container.style.height = '100vh';
-            container.style.maxHeight = '800px';
-          }
-          
-          // Force refresh by reloading the page to reinitialize the animation
+          updateLayoutForDeviceType(newIsMobile);
+          // Force refresh to reinitialize animation
           window.location.reload();
         }
       });
       
-      // Add debug panel if needed
-      if (window.location.search.includes('debug')) {
-        const debugPanel = document.createElement('div');
-        debugPanel.className = 'debug-panel';
-        document.body.appendChild(debugPanel);
+      /**
+       * Updates layout elements for the current device type
+       * @param {boolean} isMobile - Whether the current view is mobile
+       */
+      function updateLayoutForDeviceType(isMobile) {
+        const paths = [
+          document.getElementById('roadPath'),
+          document.getElementById('roadShadowPath'),
+          ...document.querySelectorAll('.road-main, .road-markings')
+        ];
         
-        setInterval(() => {
-          const st = ScrollTrigger.getAll()[0];
-          const progress = st ? st.progress : 0;
-          const markerBBox = movingPerson.getBBox();
-          debugPanel.innerHTML = `Progress: ${(progress * 100).toFixed(1)}%<br>Pos: (${markerBBox.x + markerBBox.width/2}, ${markerBBox.y + markerBBox.height/2})`;
-        }, 100);
+        const pathData = isMobile ? mobilePathData : pathData;
+        paths.forEach(path => path.setAttribute('d', pathData));
+        
+        // Update SVG viewBox
+        const svgElement = container.querySelector('svg');
+        svgElement.setAttribute('viewBox', 
+          isMobile ? '0 0 600 1200' : '0 0 1200 600'
+        );
+        
+        // Update container dimensions
+        container.style.height = isMobile ? '150vh' : '100vh';
+        container.style.maxHeight = isMobile ? 'none' : '800px';
       }
+      
+      // Add debug panel if debug mode is enabled
+      if (window.location.search.includes('debug')) {
+        initDebugPanel();
+      }
+    }
+
+    /**
+     * Initializes debug panel for development and testing
+     * Shows real-time progress and position information
+     */
+    function initDebugPanel() {
+      const debugPanel = document.createElement('div');
+      debugPanel.className = 'debug-panel';
+      document.body.appendChild(debugPanel);
+      
+      setInterval(() => {
+        const st = ScrollTrigger.getAll()[0];
+        const progress = st ? st.progress : 0;
+        const markerBBox = movingPerson.getBBox();
+        debugPanel.innerHTML = 
+          `Progress: ${(progress * 100).toFixed(1)}%<br>
+           Pos: (${markerBBox.x + markerBBox.width/2}, 
+                 ${markerBBox.y + markerBBox.height/2})`;
+      }, 100);
     }
   } catch (error) {
     console.error('Error loading icons:', error);
