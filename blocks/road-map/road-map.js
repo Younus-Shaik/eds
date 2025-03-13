@@ -1,26 +1,4 @@
-// Utility function for setting multiple attributes
-function setAttributes(element, attributes) {
-  Object.entries(attributes).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      element.setAttribute(key, value);
-    }
-  });
-  return element;
-}
-
-// Helper function to load and use external SVG icons
-async function loadSvgIcon(iconPath) {
-  try {
-    const response = await fetch(iconPath);
-    const svgText = await response.text();
-    const parser = new DOMParser();
-    const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-    return svgDoc.documentElement;
-  } catch (error) {
-    console.error(`Error loading SVG icon from ${iconPath}:`, error);
-    return null;
-  }
-}
+import { setAttributes, loadSvgIcon } from '../../utils/svg-parser.js';
 
 export default async function decorate(block) {
   // Create the main container for the roadmap
